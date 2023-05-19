@@ -1,0 +1,88 @@
+# https://github.com/FiloSottile/mkcert
+
+version: "3.7"
+services:
+    app:
+        build:
+            args:
+                user: omarceleza
+                uid: 1000
+            context: .
+            dockerfile: ./.docker/php/Dockerfile
+        image: sm-funil-vendas-app
+        # container_name: app
+        restart: unless-stopped
+        working_dir: /var/www/html
+        volumes:
+            - ./.docker/php/php.ini:/usr/local/etc/php/php.ini
+            - ./:/var/www/html
+        networks:
+            - qimovel-modernMonolith
+        # command: composer install
+
+    db:
+        image: postgres:14.5
+        restart: unless-stopped
+        environment:
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+            POSTGRES_DB: qimovel-modernMonolith_app
+        networks:
+            - qimovel-modernMonolith
+
+        ports:
+            - "5432:5432"
+        volumes:
+            - "pg_data:/var/lib/postgresql/data"
+            - ./.docker/postgres/init/init.sql:/docker-entrypoint-initdb.d/db.sql
+
+    nginx:
+        image: nginx:alpine
+        # container_name: nginx
+        tty: true
+        restart: unless-stopped
+        ports:
+            - 8080:80
+            - 443:443
+        volumes:
+            - ./.docker/nginx/conf.d:/etc/nginx/conf.d
+            - ./.docker/nginx/logs:/var/log/nginx
+            - ./:/var/www/html
+        networks:
+            - qimovel-modernMonolith
+
+    node:
+        build:
+            context: ./.docker/node
+            args:
+                user: omarceleza
+                uid: 1000
+        image: sm-funil-vendas-node
+        working_dir: /var/www/html
+        volumes:
+            - ./:/var/www/html
+            # - ${HOME}/.npm:${HOME}/.npm
+        command: npm run dev
+        ports:
+            - 5173:5173
+        depends_on:
+            - app
+
+    npm:
+        image: node:14-slim
+        working_dir: /var/www/html
+        entrypoint: ["npm"]
+        profiles:
+            - donotstart
+        volumes:
+            - "./:/var/www/html"
+
+networks:
+    qimovel-modernMonolith:
+        driver: bridge
+
+volumes:
+    pg_data:
+        # driver_opts:
+        #     type: tmpfs
+        #     device: tmpfs

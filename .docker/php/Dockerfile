@@ -1,0 +1,60 @@
+FROM php:8.1-fpm
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Arguments defined in docker-compose.yml
+ARG user
+ARG uid
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    sudo \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    libnss3-tools \
+    golang-go \
+    libzip-dev libpq-dev build-essential libssl-dev zlib1g-dev libfreetype6-dev \
+    autoconf apt-utils libmagick++-dev libmagickwand-dev libjpeg62-turbo-dev libwebp-dev libxpm-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+
+    RUN git clone https://github.com/FiloSottile/mkcert /tmp/mkcert && \
+        cd /tmp/mkcert && \
+        go build -ldflags "-X main.Version=$(git describe --tags)" && \
+        mv mkcert /usr/bin/
+
+# Install PHP extensions
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install mbstring exif pdo pdo_pgsql pgsql zip bcmath pcntl gd
+
+RUN docker-php-ext-configure zip
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+
+# 5 Install PHP Composer
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# without container
+#RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Create system user to run Composer and Artisan Commands
+RUN useradd -G www-data,root,sudo -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user && \
+    chown -R $user:$user /var/www
+
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+COPY .docker/php/bashrc /home/$user/.bashrc
+
+RUN ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+
+USER $user
+
+EXPOSE 9000
+CMD ["php-fpm"]
