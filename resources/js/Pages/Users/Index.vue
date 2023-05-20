@@ -1,11 +1,29 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
+import { useDelete, Inertia } from "@inertiajs/inertia";
+import Swal from "sweetalert2";
 import { ref } from "vue";
 const props = defineProps({
     users: Object,
 });
 const hoveredIndex = ref(null);
+
+const remove = async (user) => {
+    const toDelete = await Swal.fire({
+        title: `Apagar Usuário`,
+        text: `Confirmar a remoção de ${user.name}`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Apagar!",
+        cancelButtonText: "Cancelar",
+    });
+    if (toDelete.isConfirmed) {
+        Inertia.delete(route("usuarios.destroy", [user.id]));
+    }
+};
 </script>
 
 <template>
@@ -86,12 +104,13 @@ const hoveredIndex = ref(null);
                                                         >Editar</Link
                                                     >
                                                 </li>
-                                                <li class="">
-                                                    <a
+                                                <li class="hidden">
+                                                    <button
                                                         class="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
-                                                        href="#"
-                                                        >Apagar</a
+                                                        @click="remove(user)"
                                                     >
+                                                        Apagar
+                                                    </button>
                                                 </li>
                                             </ul>
                                         </div>
