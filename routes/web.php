@@ -35,6 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('/usuarios', \App\Http\Controllers\UsersController::class);
+    Route::get('/permissoes/all', [\App\Http\Controllers\PermissionsController::class, 'getAllPermissions'])
+        ->name('permissoes.getPermissions');
+    Route::resource('/permissoes', \App\Http\Controllers\PermissionsController::class);
 });
 
 require __DIR__ . '/auth.php';
