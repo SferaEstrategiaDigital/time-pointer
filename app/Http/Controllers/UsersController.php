@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\InsertSystemUser;
+use App\Http\Requests\UpdateSystemUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -40,17 +41,24 @@ class UsersController extends Controller
         //
     }
 
-    public function edit()
+    public function edit(User $usuario)
     {
-        // 
+        return inertia('Users/Edit', [
+            'usuario' => $usuario
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateSystemUser $request, User $usuario)
     {
-        //
+        $validatedData = $request->validated();
+        if (empty($validatedData['password'])) {
+            unset($validatedData['password']);
+        }
+        $usuario->update($validatedData);
+        return redirect()->route('usuarios.index');
     }
 
     /**
