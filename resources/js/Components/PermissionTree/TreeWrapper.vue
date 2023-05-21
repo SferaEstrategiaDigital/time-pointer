@@ -1,7 +1,13 @@
 <template>
+    {{ checkedItems }}
     <div class="flex space-x-4 overflow-auto">
         <ul v-for="item in data" class="w-full">
-            <nested-item :item="item" class="mr-4"></nested-item>
+            <nested-item
+                :item="item"
+                :checkedItems="checkedItems"
+                @checkedItemUpdated="checkedItems = $event"
+                class="mr-4"
+            ></nested-item>
         </ul>
     </div>
 </template>
