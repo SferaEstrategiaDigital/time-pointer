@@ -20,7 +20,7 @@ class PermissionsController extends Controller
 
     public function getAllPermissions(Request $request)
     {
-        return PermissionsResource::collection(Permission::get());
+        return PermissionsResource::collection(Permission::defaultOrder()->get());
     }
 
     /**

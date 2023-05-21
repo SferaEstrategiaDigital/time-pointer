@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/permissoes/all', [\App\Http\Controllers\PermissionsController::class, 'getAllPermissions'])
         ->name('permissoes.getPermissions');
     Route::resource('/permissoes', \App\Http\Controllers\PermissionsController::class);
+    Route::get('papeis/arvore', [\App\Http\Controllers\RolesController::class, 'getTree'])->name('papeis.tree');
+    Route::resource('/papeis', \App\Http\Controllers\RolesController::class);
 });
 
 require __DIR__ . '/auth.php';
