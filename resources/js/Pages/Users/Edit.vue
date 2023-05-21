@@ -8,13 +8,14 @@ const props = defineProps({
 });
 
 const form = useForm({
-    name: props.usuario.name,
-    email: props.usuario.email,
+    name: props.usuario.data.name,
+    email: props.usuario.data.email,
     password: "",
+    roles: props.usuario.data.roles.map((v) => v.id),
 });
 
 const create = () => {
-    form.put(route("usuarios.update", [props.usuario.id]), {
+    form.put(route("usuarios.update", [props.usuario.data.id]), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
     });
@@ -27,7 +28,7 @@ const create = () => {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Alterar {{ props.usuario.name }}
+                Alterar {{ form.name }}
             </h2>
         </template>
 

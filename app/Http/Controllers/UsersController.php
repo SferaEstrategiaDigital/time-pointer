@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\InsertSystemUser;
-use App\Http\Requests\UpdateSystemUser;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\InsertSystemUser;
+use App\Http\Requests\UpdateSystemUser;
+use App\Http\Resources\UserResource;
 
 class UsersController extends Controller
 {
@@ -29,7 +31,9 @@ class UsersController extends Controller
      */
     public function store(InsertSystemUser $request)
     {
-        User::create($request->validated());
+        $usuario = User::create($request->validated());
+        $roles = Role::whereIn('uuid', $request->input('roles'))->get();
+        $usuario->syncRoles($roles);
         return redirect()->route('usuarios.index');
     }
 
@@ -44,7 +48,7 @@ class UsersController extends Controller
     public function edit(User $usuario)
     {
         return inertia('Users/Edit', [
-            'usuario' => $usuario
+            'usuario' => new UserResource($usuario)
         ]);
     }
 
@@ -58,6 +62,8 @@ class UsersController extends Controller
             unset($validatedData['password']);
         }
         $usuario->update($validatedData);
+        $roles = Role::whereIn('uuid', $request->input('roles'))->get();
+        $usuario->syncRoles($roles);
         return redirect()->route('usuarios.index');
     }
 

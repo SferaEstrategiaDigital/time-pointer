@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PermissionsResource;
 use App\Models\Permission;
 use Illuminate\Http\Request;
+use App\Http\Resources\PermissionsResource;
+use App\Http\Resources\PermissionTreeResource;
 
 class PermissionsController extends Controller
 {
@@ -16,6 +17,11 @@ class PermissionsController extends Controller
         return inertia('Permissions/Index', [
             'permissions' => Permission::defaultOrder()->get()
         ]);
+    }
+
+    public function getTree()
+    {
+        return PermissionTreeResource::collection(Permission::get()->toTree());
     }
 
     public function getAllPermissions(Request $request)

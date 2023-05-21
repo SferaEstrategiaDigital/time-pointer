@@ -26,7 +26,8 @@ class UpdateSystemUser extends FormRequest
         return [
             'name' => 'required|min:3|max:50',
             'email' => ['required', 'email', Rule::unique(User::class)->ignore($this->usuario->id)],
-            'password' => 'nullable|min:6|max:20'
+            'password' => 'nullable|min:6|max:20',
+            'roles' => 'required'
         ];
     }
 }

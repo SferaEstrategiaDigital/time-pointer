@@ -35,10 +35,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('/usuarios', \App\Http\Controllers\UsersController::class);
+    /* PERMISSÕES */
+    Route::get('permissoes/arvore', [\App\Http\Controllers\PermissionsController::class, 'getTree'])
+        ->name('permissoes.tree');
     Route::get('/permissoes/all', [\App\Http\Controllers\PermissionsController::class, 'getAllPermissions'])
         ->name('permissoes.getPermissions');
     Route::resource('/permissoes', \App\Http\Controllers\PermissionsController::class);
-    Route::get('funcoes/arvore', [\App\Http\Controllers\RolesController::class, 'getTree'])->name('funcoes.tree');
+    /* FUNÇÕES */
+    Route::get('/funcoes/all', [\App\Http\Controllers\RolesController::class, 'getAllRoles'])
+        ->name('funcoes.getAll');
     Route::resource('/funcoes', \App\Http\Controllers\RolesController::class);
 });
 

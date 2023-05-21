@@ -24,7 +24,8 @@ class InsertSystemUser extends FormRequest
         return [
             'name' => 'required|min:3|max:50',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|max:20'
+            'password' => 'required|min:6|max:20',
+            'roles' => 'required'
         ];
     }
 }

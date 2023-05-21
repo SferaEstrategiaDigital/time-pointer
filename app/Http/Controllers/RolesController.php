@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PermissionTreeResource;
-use App\Models\Permission;
 use App\Models\Role;
+use App\Models\Permission;
 use Illuminate\Http\Request;
+use App\Http\Resources\RolesResource;
+use App\Http\Resources\PermissionTreeResource;
 
 class RolesController extends Controller
 {
@@ -19,9 +20,9 @@ class RolesController extends Controller
         ]);
     }
 
-    public function getTree()
+    public function getAllRoles(Request $request)
     {
-        return PermissionTreeResource::collection(Permission::get()->toTree());
+        return RolesResource::collection(Role::get());
     }
 
     /**

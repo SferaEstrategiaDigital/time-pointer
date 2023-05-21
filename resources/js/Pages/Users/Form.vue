@@ -3,11 +3,23 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import axios from "axios";
+import { onMounted, ref } from "vue";
 
 defineProps({
     form: Object,
 });
 const emits = defineEmits(["submitForm"]);
+
+const roles = ref([]);
+
+onMounted(() => {
+    axios.get(route("funcoes.getAll")).then(({ status, data }) => {
+        if (status === 200) {
+            roles.value = data.data;
+        }
+    });
+});
 </script>
 <template>
     <form @submit.prevent="emits('submitForm')" class="mt-6 space-y-6">
@@ -53,6 +65,20 @@ const emits = defineEmits(["submitForm"]);
             />
 
             <InputError :message="form.errors.password" class="mt-2" />
+        </div>
+
+        <div>
+            <InputLabel for="roles" value="Funções" />
+            <select
+                multiple
+                id="roles"
+                :disabled="!roles.length"
+                v-model="form.roles"
+            >
+                <option :value="role.id" selected v-for="role in roles">
+                    {{ role.titulo }}
+                </option>
+            </select>
         </div>
 
         <div class="flex items-center gap-4">

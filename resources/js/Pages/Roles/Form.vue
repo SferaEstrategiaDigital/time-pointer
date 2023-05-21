@@ -16,7 +16,7 @@ defineProps({
 const permissionTree = ref([]);
 
 onMounted(() => {
-    axios.get(route("funcoes.tree")).then((res) => {
+    axios.get(route("permissoes.tree")).then((res) => {
         if (res.status == 200) {
             permissionTree.value = res.data.data;
         }

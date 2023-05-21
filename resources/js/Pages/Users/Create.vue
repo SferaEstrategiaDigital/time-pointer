@@ -7,6 +7,7 @@ const form = useForm({
     name: "",
     email: "",
     password: "",
+    roles: [],
 });
 
 const create = () => {
