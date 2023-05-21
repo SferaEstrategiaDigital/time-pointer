@@ -16,7 +16,7 @@ const hoveredIndex = ref(null);
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Papéis
+                Funções
             </h2>
         </template>
 
@@ -25,10 +25,10 @@ const hoveredIndex = ref(null);
                 <div class="bg-white shadow-sm sm:rounded-lg">
                     <div class="p-3 flex justify-end">
                         <Link
-                            :href="route('papeis.create')"
+                            :href="route('funcoes.create')"
                             class="border border-green-800 hover:bg-green-600 hover:border-green-600 hover:text-white rounded-md px-3 py-2 font-bold"
                         >
-                            Novo Papel
+                            Nova função
                         </Link>
                     </div>
                     <div class="p-6">
@@ -77,7 +77,7 @@ const hoveredIndex = ref(null);
                                                         class="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
                                                         :href="
                                                             route(
-                                                                'papeis.edit',
+                                                                'funcoes.edit',
                                                                 role.id
                                                             )
                                                         "

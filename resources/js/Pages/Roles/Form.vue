@@ -16,7 +16,7 @@ defineProps({
 const permissionTree = ref([]);
 
 onMounted(() => {
-    axios.get(route("papeis.tree")).then((res) => {
+    axios.get(route("funcoes.tree")).then((res) => {
         if (res.status == 200) {
             permissionTree.value = res.data.data;
         }
@@ -26,11 +26,10 @@ onMounted(() => {
 <template>
     <form @submit.prevent="emits('submitForm')" class="mt-6 space-y-6">
         <div>
-            <InputLabel for="name" value="Nome" />
+            <InputLabel for="name" value="Título" />
 
             <TextInput
                 id="name"
-                ref="currentPasswordInput"
                 v-model="form.name"
                 type="text"
                 class="mt-1 block w-full"
@@ -43,6 +42,6 @@ onMounted(() => {
             <PrimaryButton :disabled="form.processing">Salvar</PrimaryButton>
         </div>
 
-        <PermissionWrapper :data="permissionTree" />
+        <PermissionWrapper v-model="form.permissions" :data="permissionTree" />
     </form>
 </template>

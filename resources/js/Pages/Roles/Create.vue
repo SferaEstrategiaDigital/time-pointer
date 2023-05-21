@@ -9,7 +9,7 @@ const form = useForm({
 });
 
 const create = () => {
-    form.post(route("papeis.store"), {
+    form.post(route("funcoes.store"), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
     });
@@ -17,19 +17,18 @@ const create = () => {
 </script>
 
 <template>
-    <Head title="Nova Permissão" />
+    <Head title="Nova Função" />
 
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Nova Permissão
+                Nova Função
             </h2>
         </template>
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white shadow-sm sm:rounded-lg">
-                    !{{ form }}!
                     <Form :form="form" @submitForm="create" />
                 </div>
             </div>

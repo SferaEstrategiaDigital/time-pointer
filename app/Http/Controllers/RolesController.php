@@ -37,7 +37,11 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $role = Role::create(['name' => $request->input('name')]);
+        $perms = Permission::whereIn('uuid', $request->input('permissions'))->get();
+        $role->givePermissionTo($perms);
+
+        return redirect()->route('funcoes.index');
     }
 
     /**

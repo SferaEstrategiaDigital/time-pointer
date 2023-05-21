@@ -19,7 +19,7 @@
                 :item="i"
                 :items="item.sub"
                 :checkedItems="checkedItems"
-                @checkedItemUpdated="checkedItems = $event"
+                @checkedItemUpdated="$emit('checkedItemUpdated', $event)"
                 class="pl-4"
             ></nested-item>
         </ul>
