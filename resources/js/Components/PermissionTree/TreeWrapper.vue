@@ -1,4 +1,5 @@
 <template>
+    -{{ checkedItems }}-
     <div class="flex space-x-4 overflow-auto">
         <ul v-for="item in data" class="w-full">
             <nested-item

@@ -5,6 +5,7 @@ import Form from "./Form.vue";
 
 const form = useForm({
     name: "",
+    permissions: [],
 });
 
 const create = () => {
@@ -28,6 +29,7 @@ const create = () => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white shadow-sm sm:rounded-lg">
+                    !{{ form }}!
                     <Form :form="form" @submitForm="create" />
                 </div>
             </div>
