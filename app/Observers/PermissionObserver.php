@@ -22,9 +22,8 @@ class PermissionObserver
     public function created(Permission $permission): void
     {
         if ($permission->ancestors->count()) {
-            $slugPath = array_map(fn ($v) => $v['slug'], $permission->ancestors->toArray());
-            $slugPath[] = $permission->slug;
-            $slugPath = implode('.', $slugPath);
+            $slugPath = $permission->ancestors->last();
+            $slugPath = $slugPath->slug . '.' . $permission->slug;
             $permission->slug = $slugPath;
             $permission->save();
         }
