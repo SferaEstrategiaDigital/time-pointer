@@ -8,8 +8,11 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
 import { computed, provide } from "vue";
 
-const permissions = computed(() => page.props.auth.permissions);
+import { usePage } from "@inertiajs/vue3";
 
+const page = usePage();
+const permissions = computed(() => page.props.auth.permissions);
+const can = (policy) => permissions.value.filter((v) => v == policy).length;
 provide("permissions", permissions);
 
 const props = defineProps({
@@ -47,6 +50,7 @@ const showingNavigationDropdown = ref(false);
                                     Dashboard
                                 </NavLink>
                                 <NavLink
+                                    v-if="can('usuarios.visualizar')"
                                     :href="route('usuarios.index')"
                                     :active="route().current('usuarios.index')"
                                 >
@@ -90,11 +94,21 @@ const showingNavigationDropdown = ref(false);
                                             Profile
                                         </DropdownLink>
                                         <DropdownLink
+                                            v-if="
+                                                can(
+                                                    'sistema.funcoes.visualizar'
+                                                )
+                                            "
                                             :href="route('funcoes.index')"
                                         >
                                             Funções
                                         </DropdownLink>
                                         <DropdownLink
+                                            v-if="
+                                                can(
+                                                    'sistema.permissoes.visualizar'
+                                                )
+                                            "
                                             :href="route('permissoes.index')"
                                         >
                                             Permissões

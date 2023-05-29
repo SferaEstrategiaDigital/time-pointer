@@ -2,15 +2,20 @@ import { ref, watchEffect } from "vue";
 import { usePage } from "@inertiajs/inertia-vue3";
 
 export default function usePermissions() {
-    const page = usePage();
+    const { props } = usePage();
     const permissions = ref([]);
 
     watchEffect(() => {
-        permissions.value = page.props.permissions;
+        // console.log(props);
+        // if (props.value.auth && props.value.auth.permissions) {
+        //     permissions.value = props.value.auth.permissions;
+        // }
     });
 
     const hasPermission = (permissionName) => {
-        return permissions.value.includes(permissionName);
+        // console.log(props.value);
+        // console.log(permissions.value.includes(permissionName));
+        // return permissions.value.includes(permissionName);
     };
 
     return {
