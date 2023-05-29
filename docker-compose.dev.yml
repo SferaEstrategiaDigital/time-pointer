@@ -5,7 +5,7 @@ services:
     app:
         build:
             args:
-                user: cubbus
+                user: omarceleza
                 uid: 1000
             context: .
             dockerfile: ./.docker/php/Dockerfile
@@ -17,7 +17,7 @@ services:
             - ./.docker/php/php.ini:/usr/local/etc/php/php.ini
             - ./:/var/www/html
         networks:
-            - investcubo-modernMonolith
+            - qimovel-modernMonolith
         # command: composer install
 
     db:
@@ -26,14 +26,15 @@ services:
         environment:
             POSTGRES_PASSWORD: root
             POSTGRES_USER: root
-            POSTGRES_DB: investcubo-modernMonolith_app
+            POSTGRES_DB: qimovel-modernMonolith_app
         networks:
-            - investcubo-modernMonolith
+            - qimovel-modernMonolith
 
         ports:
             - "5432:5432"
         volumes:
-            - "./.docker/pgsql/pg_data:/var/lib/postgresql/data"
+            - "pg_data:/var/lib/postgresql/data"
+            - ./.docker/postgres/init/init.sql:/docker-entrypoint-initdb.d/db.sql
 
     nginx:
         image: nginx:alpine
@@ -41,26 +42,27 @@ services:
         tty: true
         restart: unless-stopped
         ports:
-            - 80:80
+            - 8080:80
+            - 443:443
         volumes:
             - ./.docker/nginx/conf.d:/etc/nginx/conf.d
             - ./.docker/nginx/logs:/var/log/nginx
             - ./:/var/www/html
         networks:
-            - investcubo-modernMonolith
+            - qimovel-modernMonolith
 
     node:
         build:
             context: ./.docker/node
             args:
-                user: cubbus
+                user: omarceleza
                 uid: 1000
         image: sm-funil-vendas-node
         working_dir: /var/www/html
         volumes:
             - ./:/var/www/html
             # - ${HOME}/.npm:${HOME}/.npm
-        command: npm run build
+        command: npm run dev
         ports:
             - 5173:5173
         depends_on:
@@ -76,5 +78,11 @@ services:
             - "./:/var/www/html"
 
 networks:
-    investcubo-modernMonolith:
+    qimovel-modernMonolith:
         driver: bridge
+
+volumes:
+    pg_data:
+        # driver_opts:
+        #     type: tmpfs
+        #     device: tmpfs
