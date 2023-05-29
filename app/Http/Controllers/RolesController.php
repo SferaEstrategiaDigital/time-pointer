@@ -16,7 +16,7 @@ class RolesController extends Controller
     public function index()
     {
         return inertia('Roles/Index', [
-            'roles' => Role::get()
+            'roles' => RolesResource::collection(Role::get())
         ]);
     }
 
@@ -56,17 +56,26 @@ class RolesController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Role $role)
+    public function edit(Role $funco)
     {
-        //
+        return inertia('Roles/Edit', [
+            'funcao' => new RolesResource($funco)
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Role $role)
+    public function update(Request $request, Role $funco)
     {
-        //
+        $funco->update(['name' => $request->input('name')]);
+        $perms = Permission::whereIn('uuid', $request->input('permissions'))->get();
+        $funco->givePermissionTo($perms);
+
+        return redirect()->route('funcoes.index')->with('message', [
+            'icon' => 'success',
+            'title' => 'Função alterada com sucesso'
+        ]);
     }
 
     /**

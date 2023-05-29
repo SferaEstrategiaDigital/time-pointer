@@ -6,6 +6,15 @@ import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
+import { computed, provide } from "vue";
+
+const permissions = computed(() => page.props.auth.permissions);
+
+provide("permissions", permissions);
+
+const props = defineProps({
+    auth: Array,
+});
 
 const showingNavigationDropdown = ref(false);
 </script>
@@ -41,7 +50,7 @@ const showingNavigationDropdown = ref(false);
                                     :href="route('usuarios.index')"
                                     :active="route().current('usuarios.index')"
                                 >
-                                    Clientes
+                                    Usuários
                                 </NavLink>
                             </div>
                         </div>

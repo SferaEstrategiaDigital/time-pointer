@@ -1,13 +1,11 @@
 <script setup>
-import usePermissions from "@/Composables/usePermissions";
-const { hasPermission } = usePermissions();
+import { inject } from "vue";
+
+const permissions = inject("permissions");
 </script>
 
 <template>
     <div class="grid grid-cols-12 gap-4">
-        <div class="text-center bg-green-900 text-white font-bold">
-            Marceleza
-        </div>
         <a class="btn">
             <p>89653</p>
             <p>Imoveis</p>

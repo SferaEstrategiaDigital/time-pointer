@@ -41,7 +41,10 @@ const hoveredIndex = ref(null);
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(role, index) in roles" :key="index">
+                                <tr
+                                    v-for="(role, index) in roles.data"
+                                    :key="index"
+                                >
                                     <td class="border px-4 py-2">
                                         <input
                                             type="checkbox"
@@ -49,7 +52,7 @@ const hoveredIndex = ref(null);
                                         />
                                     </td>
                                     <td class="border px-4 py-2">
-                                        {{ role.name }}
+                                        {{ role.titulo }}
                                     </td>
                                     <td class="border px-4 py-2">
                                         <div

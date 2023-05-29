@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Role extends RoleSpatie
 {
     use HasFactory;
+
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
 }
