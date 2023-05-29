@@ -9,9 +9,19 @@
                 @change="updateChecked($event, item.id)"
                 :checked="checkedItems.includes(item.id)"
             />
-            <label :for="item.caminho" class="ml-2 cursor-pointer">{{
-                item.name
-            }}</label>
+            <label
+                :for="item.caminho"
+                class="ml-2 cursor-pointer"
+                :title="item.caminho"
+                >{{ item.name }}</label
+            >
+            <button
+                title="Copiar o caminho para a Área de transferência"
+                class="bg-orange-100 text-gray-400 ml-2 px-1 py-0.5 rounded-md text-xs"
+                @click.prevent="copyToClipboard(item.caminho)"
+            >
+                CP
+            </button>
         </div>
         <ul v-if="item.sub && item.sub.length">
             <nested-item
@@ -27,11 +37,15 @@
 </template>
 
 <script setup>
+import useClipboard from "@/Composables/useClipboard";
 import NestedItem from "./NestedItem.vue";
 const props = defineProps({
     item: Object,
     checkedItems: { type: Array, required: true },
 });
+
+const { copyToClipboard } = useClipboard();
+
 const emit = defineEmits(["checkedItemUpdated"]);
 
 const updateChecked = (event, id) => {
