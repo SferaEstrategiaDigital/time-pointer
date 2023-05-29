@@ -9,7 +9,7 @@ const props = defineProps({
 
 const form = useForm({
     name: props.funcao.data.titulo,
-    permissions: [],
+    permissions: props.funcao.data.permissoes.map((v) => v.id),
 });
 
 const update = () => {

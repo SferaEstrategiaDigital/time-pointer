@@ -70,7 +70,7 @@ class RolesController extends Controller
     {
         $funco->update(['name' => $request->input('name')]);
         $perms = Permission::whereIn('uuid', $request->input('permissions'))->get();
-        $funco->givePermissionTo($perms);
+        $funco->syncPermissions($perms);
 
         return redirect()->route('funcoes.index')->with('message', [
             'icon' => 'success',
