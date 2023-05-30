@@ -7,10 +7,8 @@ services:
             args:
                 user: omarceleza
                 uid: 1000
-            context: .
-            dockerfile: ./.docker/php/Dockerfile
-        image: sm-funil-vendas-app
-        # container_name: app
+            context: ./.docker/php/
+            dockerfile: Dockerfile.dev
         restart: unless-stopped
         working_dir: /var/www/html
         volumes:
@@ -18,7 +16,6 @@ services:
             - ./:/var/www/html
         networks:
             - qimovel-modernMonolith
-        # command: composer install
 
     db:
         image: postgres:14.5
@@ -57,7 +54,6 @@ services:
             args:
                 user: omarceleza
                 uid: 1000
-        image: sm-funil-vendas-node
         working_dir: /var/www/html
         volumes:
             - ./:/var/www/html
@@ -76,6 +72,18 @@ services:
             - donotstart
         volumes:
             - "./:/var/www/html"
+
+    supervisor:
+        build:
+            args:
+                user: omarceleza
+                uid: 1000
+            context: .docker/supervisor
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./:/var/www/html
+        networks:
+            - qimovel-modernMonolith
 
 networks:
     qimovel-modernMonolith:
