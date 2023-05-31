@@ -3,7 +3,7 @@ import laravel from "laravel-vite-plugin";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
-    base: "https://investcubo.com.br/",
+    base: "",
     server: {
         cors: {
             origin: "*",
@@ -17,7 +17,7 @@ export default defineConfig({
         vue({
             template: {
                 transformAssetUrls: {
-                    base: null,
+                    base: "",
                     includeAbsolute: false,
                 },
             },
