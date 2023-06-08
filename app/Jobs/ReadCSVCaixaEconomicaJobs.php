@@ -43,8 +43,6 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
             die;
         }
 
-        // DB::rollBack();
-        // DB::beginTransaction();
         $file->update([
             'failed' => 1
         ]);
@@ -63,6 +61,16 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
 
             $columns = explode(';', $row);
 
+            $num_imovel = trim($columns[0]);
+
+            $md5Row = md5($row);
+
+            $oldReg = CaixaCsv::where('num_imovel', $num_imovel)->latest()->first();
+
+            if ($oldReg && $oldReg->md5_row === $md5Row) {
+                continue;
+            }
+
             $uf = strtolower(trim($columns[1]));
             $estado = EstadosBrasileiro::where('uf', $uf)->first();
             if (!$estado) {
@@ -75,33 +83,46 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                     'nome' => strtoupper($columns[2]),
                 ]);
 
-            $num_imovel = $columns[0];
+            $valor_venda = trim(str_replace('.', '', str_replace(',', '.', $columns[5])));
 
-            $oldReg = CaixaCsv::where('num_imovel', $num_imovel)->latest();
+            // Em casos onde há ponto-e-vírgula no endereço usar outra forma de extrair as colunas.
+            if ($valor_venda !== floatval($valor_venda)) {
+                // Separa a linha com erro até a coluna que costuma falhar
+                $damagedRow = explode(';', $row, 5);
+                // extrai o resto da string para correção
+                $newRow = array_pop($damagedRow);
+                // Busca com regex onde fica o primeiro valor monetário, será usado como base para a separação
+                preg_match("/.+?;([0-9\.]+,[0-9]{2})?;/", $newRow, $matches, PREG_OFFSET_CAPTURE);
+                // Extrai da busca acima a posição de corte
+                $positionToSplit = $matches[1][1];
+                // Extrai o enderço, o menos um é para ignorar o ponto-e-vírgula
+                $address = substr($newRow, 0, $positionToSplit - 1);
+                // Extrai o resto dos dados e separa por ponto-e-vírgula
+                $restRow = explode(';', substr($newRow, $positionToSplit));
+                // Colunas refeitas
+                $columns = array_merge($damagedRow, [$address], $restRow);
 
-            $newReg = $file->csvs()->create([
+                // Repara o "valor de venda"
+                $valor_venda = trim(str_replace('.', '', str_replace(',', '.', $columns[5])));
+            }
+
+            $file->csvs()->create([
                 'num_imovel' => trim($num_imovel),
                 'bairro' => trim(iconv("ISO-8859-1", "UTF-8", $columns[3])),
                 'endereco' => trim(iconv("ISO-8859-1", "UTF-8", $columns[4])),
                 'cidades_brasileira_id' => $cidade->id,
+                'valor_venda' => $valor_venda,
+                'valor_avaliacao' => trim(str_replace('.', '', str_replace(',', '.', $columns[6]))),
+                'desconto' => trim(str_replace('.', '', str_replace(',', '.', $columns[7]))),
+                'modalidade_venda' => trim(iconv("ISO-8859-1", "UTF-8", $columns[9])),
+                'md5_row' => $md5Row,
             ]);
-            try {
-                $newReg->update([
-                    'valor_venda' => trim(str_replace('.', '', str_replace(',', '.', $columns[5]))),
-                    'valor_avaliacao' => trim(str_replace('.', '', str_replace(',', '.', $columns[6]))),
-                    'desconto' => trim(str_replace('.', '', str_replace(',', '.', $columns[7]))),
-                    'modalidade_venda' => trim(iconv("ISO-8859-1", "UTF-8", $columns[9])),
-                    'md5_row' => trim(md5($row)),
-                ]);
-            } catch (\Throwable $th) {
-                Log::critical("Falha ao processar o arquivo {$file->uuid}:{$index} ({$newReg->id})");
-            }
-            $url = $columns[10];
+
+            // $url = $columns[10]; // TODO: analisar no futuro a URL
         }
         $file->update([
             'failed' => 0,
             'processed_at' => now()
         ]);
-        // DB::commit();
     }
 }

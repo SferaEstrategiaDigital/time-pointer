@@ -2,8 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\EstadosBrasileiro;
-use App\Models\FilesCaixaEconomica;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
@@ -19,11 +17,16 @@ class DownloadCSVCaixaJobs implements ShouldQueue
 
     protected $url = "https://venda-imoveis.caixa.gov.br/listaweb/Lista_imoveis_%s.csv";
 
+    public function __construct(protected $estado)
+    {
+    }
+
     /**
      * Execute the job.
      */
     public function handle(): void
     {
+        $estado = $this->estado;
         $client = new Client();
         $path = storage_path("app/Caixa/CSVs");
 
@@ -31,24 +34,17 @@ class DownloadCSVCaixaJobs implements ShouldQueue
             mkdir($path, 0775, true);
         }
 
-        $estados = EstadosBrasileiro::inRandomOrder()->get();
+        $fileName = (string)Str::uuid();
 
-        foreach ($estados as $estado) {
+        $client->request('GET', sprintf($this->url, $estado->uf), [
+            'sink' => $path . "/{$fileName}.csv"
+        ]);
 
-            $fileName = (string)Str::uuid();
+        $file = $estado->filesCaixaEconomica()->create([
+            'uuid' => $fileName,
+            'md5' => md5_file($path . "/{$fileName}.csv")
+        ]);
 
-            $client->request('GET', sprintf($this->url, $estado->uf), [
-                'sink' => $path . "/{$fileName}.csv"
-            ]);
-
-            $file = $estado->filesCaixaEconomica()->create([
-                'uuid' => $fileName,
-                'md5' => md5_file($path . "/{$fileName}.csv")
-            ]);
-
-            ReadCSVCaixaEconomicaJobs::dispatch($file);
-
-            sleep(rand(3, 8));
-        }
+        ReadCSVCaixaEconomicaJobs::dispatch($file);
     }
 }
