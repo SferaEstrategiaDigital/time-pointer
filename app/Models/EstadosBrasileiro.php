@@ -13,4 +13,9 @@ class EstadosBrasileiro extends Model
     {
         return $this->hasMany(FilesCaixaEconomica::class);
     }
+
+    public function cidades()
+    {
+        return $this->hasMany(CidadesBrasileira::class);
+    }
 }

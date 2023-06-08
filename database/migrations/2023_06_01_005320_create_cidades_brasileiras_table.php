@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files_caixa_economicas', function (Blueprint $table) {
+        Schema::create('cidades_brasileiras', function (Blueprint $table) {
             $table->id();
-            $table->uuid();
-            $table->string('md5', 32)->nullable();
             $table->foreignIdFor(\App\Models\EstadosBrasileiro::class);
-            $table->timestamp('processed_at')->nullable();
-            $table->unsignedTinyInteger('failed')->nullable();
+            $table->string("nome");
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files_caixa_economicas');
+        Schema::dropIfExists('cidades_brasileiras');
     }
 };

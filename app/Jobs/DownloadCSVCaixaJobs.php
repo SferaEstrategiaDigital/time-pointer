@@ -41,12 +41,14 @@ class DownloadCSVCaixaJobs implements ShouldQueue
                 'sink' => $path . "/{$fileName}.csv"
             ]);
 
-            $estado->filesCaixaEconomica()->create([
+            $file = $estado->filesCaixaEconomica()->create([
                 'uuid' => $fileName,
                 'md5' => md5_file($path . "/{$fileName}.csv")
             ]);
 
-            sleep(rand(15, 30));
+            ReadCSVCaixaEconomicaJobs::dispatch($file);
+
+            sleep(rand(3, 8));
         }
     }
 }
