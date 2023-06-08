@@ -31,7 +31,7 @@ class DownloadCSVCaixaJobs implements ShouldQueue
             mkdir($path, 0775, true);
         }
 
-        $estados = EstadosBrasileiro::get();
+        $estados = EstadosBrasileiro::inRandomOrder()->get();
 
         foreach ($estados as $estado) {
 
