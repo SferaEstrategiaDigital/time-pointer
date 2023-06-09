@@ -65,6 +65,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
 
             $md5Row = md5($row);
 
+            // Busca pelo registro mais recente onde o num do imovel seja o que estou buscando
             $oldReg = CaixaCsv::where('num_imovel', $num_imovel)->latest()->first();
 
             if ($oldReg && $oldReg->md5_row === $md5Row) {
@@ -83,10 +84,10 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                     'nome' => strtoupper($columns[2]),
                 ]);
 
-            $valor_venda = trim(str_replace('.', '', str_replace(',', '.', $columns[5])));
+            $valor_venda = str_replace(',', '.', str_replace('.', '', $columns[5]));
 
             // Em casos onde há ponto-e-vírgula no endereço usar outra forma de extrair as colunas.
-            if ($valor_venda !== floatval($valor_venda)) {
+            if (trim($valor_venda) !== floatval($valor_venda)) {
                 // Separa a linha com erro até a coluna que costuma falhar
                 $damagedRow = explode(';', $row, 5);
                 // extrai o resto da string para correção
@@ -103,18 +104,18 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                 $columns = array_merge($damagedRow, [$address], $restRow);
 
                 // Repara o "valor de venda"
-                $valor_venda = trim(str_replace('.', '', str_replace(',', '.', $columns[5])));
+                $valor_venda = trim(str_replace(',', '.', str_replace('.', '', $columns[5])));
             }
 
             $file->csvs()->create([
-                'num_imovel' => trim($num_imovel),
-                'bairro' => trim(iconv("ISO-8859-1", "UTF-8", $columns[3])),
-                'endereco' => trim(iconv("ISO-8859-1", "UTF-8", $columns[4])),
+                'num_imovel' => $num_imovel,
+                'bairro' => iconv("ISO-8859-1", "UTF-8", $columns[3]),
+                'endereco' => iconv("ISO-8859-1", "UTF-8", $columns[4]),
                 'cidades_brasileira_id' => $cidade->id,
                 'valor_venda' => $valor_venda,
-                'valor_avaliacao' => trim(str_replace('.', '', str_replace(',', '.', $columns[6]))),
-                'desconto' => trim(str_replace('.', '', str_replace(',', '.', $columns[7]))),
-                'modalidade_venda' => trim(iconv("ISO-8859-1", "UTF-8", $columns[9])),
+                'valor_avaliacao' => str_replace(',', '.', str_replace('.', '', $columns[6])),
+                'desconto' => floatval($columns[7]),
+                'modalidade_venda' => iconv("ISO-8859-1", "UTF-8", $columns[9]),
                 'md5_row' => $md5Row,
             ]);
 

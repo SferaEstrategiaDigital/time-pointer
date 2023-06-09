@@ -5,6 +5,7 @@ namespace App\Jobs;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,9 +37,15 @@ class DownloadCSVCaixaJobs implements ShouldQueue
 
         $fileName = (string)Str::uuid();
 
-        $client->request('GET', sprintf($this->url, $estado->uf), [
-            'sink' => $path . "/{$fileName}.csv"
-        ]);
+        try {
+            $client->request('GET', sprintf($this->url, $estado->uf), [
+                'sink' => $path . "/{$fileName}.csv"
+            ]);
+        } catch (\Throwable $th) {
+            Log::critical("Falha ao baixar arquivo do estado {$estado->uf}");
+            die;
+        }
+
 
         $file = $estado->filesCaixaEconomica()->create([
             'uuid' => $fileName,
