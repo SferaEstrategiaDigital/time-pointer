@@ -4,10 +4,31 @@
             class="flex flex-col bg-green-100 px-2 py-0.5 rounded-lg cursor-pointer"
             title="Clique aqui para alterar"
         >
-            <div class="flex items-center">
-                <span class="font-bold">Ordenar por:</span>
-                <small class="ml-2">Apartamento</small>
-            </div>
+            <Tooltip class="flex items-center">
+                <template #title>
+                    <span class="font-bold">Ordenar por:</span
+                    ><span class="ml-2">Mais relevantes</span></template
+                >
+                <template #content>
+                    <ul class="bg-white rounded-lg overflow-hidden mt-2 w-">
+                        <li class="p-1 box-border border bg-green-600">
+                            Menor valor
+                        </li>
+                        <li class="p-1 box-border border bg-green-600">
+                            Maior valor
+                        </li>
+                        <li class="p-1 box-border border bg-green-600">
+                            Mais relevantes
+                        </li>
+                        <li class="p-1 box-border border bg-green-600">
+                            Menor desconto
+                        </li>
+                        <li class="p-1 box-border border bg-green-600">
+                            Maior desconto
+                        </li>
+                    </ul>
+                </template>
+            </Tooltip>
         </div>
 
         <div
@@ -32,6 +53,7 @@
 <script setup>
 import { ref } from "vue";
 import ResultItem from "./ResultItem.vue";
+import Tooltip from "../Tooltip.vue";
 
 let searchInput = ref("");
 
