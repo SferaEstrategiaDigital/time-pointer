@@ -10,11 +10,11 @@ class CaixaCsv extends Model
     use HasFactory;
 
     protected $fillable = [
-        'num_imovel', 'valor_venda', 'valor_avaliacao',
+        'insc_imobiliaria', 'scrapped_at', 'detalhes',
         'desconto', 'modalidade_venda', 'endereco',
-        'bairro', 'tipo_imovel', 'quartos', 'md5_row',
-        'inscr_imobiliaria', 'scrapped_at',
-        'cidades_brasileira_id'
+        'bairro', 'property_type_id', 'num_quartos', 'md5_row',
+        'num_imovel', 'valor_venda', 'valor_avaliacao',
+        'cidades_brasileira_id', 'averbacao_leiloes_negativos',
     ];
 
     protected $casts = [

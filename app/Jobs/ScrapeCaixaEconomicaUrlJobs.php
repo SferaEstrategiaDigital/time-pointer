@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\CaixaCsv;
 use GuzzleHttp\Client;
 use App\Models\PropertyType;
 use Illuminate\Bus\Queueable;
@@ -18,17 +19,47 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $url = "https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnOrigem=index&hdnimovel=%s";
+    protected $crawlerInstance;
 
-    public function __construct(protected $csvRow)
+    public function __construct(protected CaixaCsv $csvRow)
     {
         $this->csvRow = $csvRow;
         $this->url = sprintf($this->url, $this->csvRow->num_imovel);
+        // Log::info("({$csvRow}) {$this->url}");
     }
 
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(): bool
+    {
+        $csvRow = $this->csvRow;
+
+        $data = $this->getData();
+
+        $tipoImovel = PropertyType::firstOrCreate([
+            'type' => $data['tipo_imovel']
+        ]);
+
+        try {
+            $csvRow->update([
+                'endereco' => $data['endereco'],
+                'insc_imobiliaria' => $data['insc_imobiliaria'],
+                'num_quartos' => $data['num_quartos'],
+                'averbacao_leiloes_negativos' => $data['averbacao_leiloes_negativos'],
+                'property_type_id' => $tipoImovel->id,
+                'detalhes' => $data['detalhes'],
+                'scrapped_at' => now(),
+            ]);
+        } catch (\Throwable $th) {
+            Log::critical("Scrape Error update:{$csvRow->id};{$th->getMessage()};" . json_encode($data));
+            Log::critical(json_encode($th->getTrace()));
+        }
+
+        return true;
+    }
+
+    protected function getData()
     {
         $csvRow = $this->csvRow;
 
@@ -37,17 +68,34 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         try {
             $response = $client->request('GET', $this->url);
         } catch (\Throwable $th) {
-            Log::critical("Scrape Error: {$csvRow->id}");
-            die;
+            Log::critical("Scrape Error connection: {$csvRow->id}");
+            return false;
         }
 
         /* VERIFICA SE O STATUS DA RESPOSTA É 200 OU 301 */
         if (!in_array($response->getStatusCode(), ['200', '301'])) {
             die;
         }
-        $crawler = new Crawler((string)$response->getBody());
+        $this->crawlerInstance = new Crawler((string)$response->getBody());
 
-        $informacoes = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[3]')
+        $data = [];
+        // $valorVenda = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[2]/h4[2]');
+        // $valorAvaliacao = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[2]/h4[1]');
+        // $num_imovel = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[2]/div[1]/p/span[3]/strong');
+
+        $data['num_quartos'] = $this->extractInfo('//span[contains(text(), "Quartos")]');
+
+        $data['insc_imobiliaria'] = $this->extractInfo('//span[contains(text(), "Inscrição imobiliária")]');
+
+        $data['averbacao_leiloes_negativos'] = $this->extractInfo('//span[contains(text(), "Averbação dos leilões negativos")]');
+
+        $data['detalhes'] = $this->extractInfo('//html/body/div[1]/form/div[1]/div/div[3]/p[2]');
+
+        $endereco = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[1]')
+            ->html();
+        $data['endereco'] = explode('<br>', $endereco)[1];
+
+        $data['informacoes'] = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[3]')
             ->each(function ($node) {
                 $linhas = explode('<br>', $node->html());
                 $dados = [];
@@ -61,31 +109,19 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
                 return $dados;
             });
-        // $valorVenda = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[2]/h4[2]');
-        // $valorAvaliacao = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[2]/h4[1]');
-        // $num_imovel = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[2]/div[1]/p/span[3]/strong');
-        $num_quartos = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[2]/div[1]/p/span[2]/strong');
-        $insc_imobiliaria = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[2]/div[1]/p/span[7]/strong');
-        $averbacao_leiloes_negativos = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[2]/div[1]/p/span[8]/strong');
+        $data['tipo_imovel'] = $this->extractInfo('//span[contains(text(), "Tipo de imóvel")]');
 
-        $detalhes = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[3]/p[2]');
-        $endereco = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[1]')
-            ->html();
-        $endereco = explode('<br>', $endereco)[1];
+        return $data;
+    }
 
-        $tipoImovel = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[2]/div[1]/p/span[1]/strong');
-        $tipoImovel = PropertyType::firstOrCreate([
-            'type' => $tipoImovel->text()
-        ]);
-
-        $csvRow->update([
-            'endereco' => $endereco,
-            'insc_imobiliaria' => $insc_imobiliaria->text(),
-            'num_quartos' => $num_quartos->text(),
-            'averbacao_leiloes_negativos' => $averbacao_leiloes_negativos->text(),
-            'property_type_id' => $tipoImovel->id,
-            'detalhes' => $detalhes->text(),
-            'scrapped_at' => now()
-        ]);
+    protected function extractInfo($xpath)
+    {
+        try {
+            $data = $this->crawlerInstance->filterXPath($xpath);
+            return trim(explode(':', $data->text())[1]);
+        } catch (\Throwable $th) {
+            Log::critical("Scrape Error notFound:{$xpath}");
+            return false;
+        }
     }
 }
