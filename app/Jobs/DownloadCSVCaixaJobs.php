@@ -28,7 +28,9 @@ class DownloadCSVCaixaJobs implements ShouldQueue
     public function handle(): void
     {
         $estado = $this->estado;
-        $client = new Client();
+        $client = new Client([
+            'verify' => false,
+        ]);
         $path = storage_path("app/Caixa/CSVs");
 
         if (!file_exists($path)) {
@@ -43,7 +45,8 @@ class DownloadCSVCaixaJobs implements ShouldQueue
             ]);
         } catch (\Throwable $th) {
             Log::critical("Falha ao baixar arquivo do estado {$estado->uf}");
-            die;
+            log::critical(json_encode($th->getTrace()));
+            return;
         }
 
 
