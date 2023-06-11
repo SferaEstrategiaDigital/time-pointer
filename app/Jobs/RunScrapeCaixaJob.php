@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\CaixaCsv;
+use App\Models\CaixaImovel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,7 +27,7 @@ class RunScrapeCaixaJob implements ShouldQueue
      */
     public function handle(): bool
     {
-        $toScrape = CaixaCsv::whereNull('scrapped_at')->inRandomOrder()->get();
+        $toScrape = CaixaImovel::whereNull('scrapped_at')->inRandomOrder()->get();
 
         foreach ($toScrape as $item) {
             ScrapeCaixaEconomicaUrlJobs::dispatch($item);

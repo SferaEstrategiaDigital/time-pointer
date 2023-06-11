@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\CaixaCsv;
+use App\Models\CaixaImovel;
 use Illuminate\Bus\Queueable;
 use App\Models\CaixaEconimicaCSV;
 use App\Models\EstadosBrasileiro;
@@ -66,7 +66,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
             $md5Row = md5($row);
 
             // Busca pelo registro mais recente onde o num do imovel seja o que estou buscando
-            $oldReg = CaixaCsv::where('num_imovel', $num_imovel)->latest()->first();
+            $oldReg = CaixaImovel::where('num_imovel', $num_imovel)->latest()->first();
 
             if ($oldReg && $oldReg->md5_row === $md5Row) {
                 continue;

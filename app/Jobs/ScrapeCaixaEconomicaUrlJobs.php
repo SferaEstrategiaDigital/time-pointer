@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\CaixaCsv;
+use App\Models\CaixaImovel;
 use GuzzleHttp\Client;
 use App\Models\PropertyType;
 use Illuminate\Bus\Queueable;
@@ -21,7 +21,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
     protected $url = "https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnOrigem=index&hdnimovel=%s";
     protected $crawlerInstance;
 
-    public function __construct(protected CaixaCsv $csvRow)
+    public function __construct(protected CaixaImovel $csvRow)
     {
         $this->csvRow = $csvRow;
         $this->url = sprintf($this->url, $this->csvRow->num_imovel);
@@ -37,7 +37,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
         $data = $this->getData();
 
-        dd($data);
+        // dd($data);
 
         $tipoImovel = PropertyType::firstOrCreate([
             'type' => $data['tipo_imovel']
@@ -111,7 +111,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         // Remove os nulos
         $spans = array_filter($spans);
 
-        dd($spans);
+        // dd($spans);
 
         $data['num_quartos'] = $this->extractInfo($spans,"Quartos: ", 0);
         $data['insc_imobiliaria'] = $this->extractInfo($spans, "Inscrição imobiliária: ", 0);

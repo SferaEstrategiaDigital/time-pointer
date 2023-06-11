@@ -12,6 +12,6 @@ class CidadesBrasileira extends Model
 
     public function caixaEconomicaCsv()
     {
-        return $this->hasMany(CaixaCsv::class);
+        return $this->hasMany(CaixaImovel::class);
     }
 }

@@ -21,6 +21,6 @@ class FilesCaixaEconomica extends Model
 
     public function csvs()
     {
-        return $this->hasMany(CaixaCsv::class);
+        return $this->hasMany(CaixaImovel::class);
     }
 }

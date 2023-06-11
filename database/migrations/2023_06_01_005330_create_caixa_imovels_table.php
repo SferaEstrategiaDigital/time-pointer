@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('caixa_csvs', function (Blueprint $table) {
+        Schema::create('caixa_imovels', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\CidadesBrasileira::class)->nullable();
             $table->foreignIdFor(\App\Models\PropertyType::class)->nullable();
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('caixa_csvs');
+        Schema::dropIfExists('caixa_imovels');
     }
 };
