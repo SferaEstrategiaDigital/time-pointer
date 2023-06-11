@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid()->nullable();
             $table->morphs('loggable');
-            $table->morphs('user_assignable');
+            $table->nullableMorphs('user_assignable');
             $table->text('message');
             $table->string('keyword')->nullable();
             $table->timestamps();

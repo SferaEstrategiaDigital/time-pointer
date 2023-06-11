@@ -23,4 +23,9 @@ class CaixaCsv extends Model
         ['desconto' => 'double'],
         ['scrapped_at' => 'datetime']
     ];
+
+    public function logs()
+    {
+        return $this->morphMany(Log::class, 'loggable');
+    }
 }
