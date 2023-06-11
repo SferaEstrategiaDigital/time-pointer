@@ -74,7 +74,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
         /* VERIFICA SE O STATUS DA RESPOSTA É 200 OU 301 */
         if (!in_array($response->getStatusCode(), ['200', '301'])) {
-            die;
+            return;
         }
         $this->crawlerInstance = new Crawler((string)$response->getBody());
 
