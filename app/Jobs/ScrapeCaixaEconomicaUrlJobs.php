@@ -25,7 +25,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
     {
         $this->csvRow = $csvRow;
         $this->url = sprintf($this->url, $this->csvRow->num_imovel);
-        // Log::info("({$csvRow}) {$this->url}");
+        Log::info("{$this->url}");
     }
 
     /**
@@ -36,6 +36,8 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         $csvRow = $this->csvRow;
 
         $data = $this->getData();
+
+        dd($data);
 
         $tipoImovel = PropertyType::firstOrCreate([
             'type' => $data['tipo_imovel']
@@ -83,45 +85,53 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         // $valorAvaliacao = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[2]/h4[1]');
         // $num_imovel = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[2]/div[1]/p/span[3]/strong');
 
-        $data['num_quartos'] = $this->extractInfo('//span[contains(text(), "Quartos")]');
-
-        $data['insc_imobiliaria'] = $this->extractInfo('//span[contains(text(), "Inscrição imobiliária")]');
-
-        $data['averbacao_leiloes_negativos'] = $this->extractInfo('//span[contains(text(), "Averbação dos leilões negativos")]');
-
-        $data['detalhes'] = $this->extractInfo('//html/body/div[1]/form/div[1]/div/div[3]/p[2]');
-
         $endereco = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[1]')
             ->html();
         $data['endereco'] = explode('<br>', $endereco)[1];
 
-        $data['informacoes'] = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[3]')
-            ->each(function ($node) {
-                $linhas = explode('<br>', $node->html());
-                $dados = [];
-
-                foreach ($linhas as $linha) {
-                    if (!trim($linha)) {
-                        continue;
-                    }
-                    $dados[] = trim(strip_tags($linha), "&nbsp; \t\n\r\0\x0B");
+        // BUSCA PELO COMENTÁRIO ONDE DEFINE SE O IMÓVEL É OU NÃO OCUPADO
+        $ocupacao = $this->crawlerInstance->filterXPath('//comment()')->each(function (Crawler $node, $i) {
+            if (strpos($node->text(), 'span>') !== false) {
+                preg_match('/<strong>(.*?)<\/strong>/', $node->text(), $matches);
+                if(isset($matches[1])){
+                    return $matches[1];
                 }
+            }
+        });
 
-                return $dados;
+        $ocupacao = array_filter($ocupacao);
+        $data['ocupacao'] = end($ocupacao);
+
+        $spans = $this->crawlerInstance->filterXpath('//span')
+            ->each(function ($node) {
+                if(strpos($node->text(), ':') || strpos($node->text(), '=')){
+                    return $node->text();
+                }
             });
-        $data['tipo_imovel'] = $this->extractInfo('//span[contains(text(), "Tipo de imóvel")]');
+        // Remove os nulos
+        $spans = array_filter($spans);
+
+        dd($spans);
+
+        $data['num_quartos'] = $this->extractInfo($spans,"Quartos: ", 0);
+        $data['insc_imobiliaria'] = $this->extractInfo($spans, "Inscrição imobiliária: ", 0);
+        $data['averbacao_leiloes_negativos'] = $this->extractInfo($spans, "Averbação dos leilões negativos: ", 0);
+        $data['tipo_imovel'] = $this->extractInfo($spans, "Tipo de imóvel: ", 0);
+
+        $destaque = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div[1]/div/div[3]/p[2]');
+
+        $data['detalhes'] = $destaque->count() ? (strpos($destaque->text(), "Descrição:") > -1 ? trim(explode("Descrição:", $destaque->text())[1]) : "") : "";
 
         return $data;
     }
 
-    protected function extractInfo($xpath)
+    protected function extractInfo($spans, $findFor, $default = false)
     {
-        try {
-            $data = $this->crawlerInstance->filterXPath($xpath);
-            return trim(explode(':', $data->text())[1]);
-        } catch (\Throwable $th) {
-            Log::critical("Scrape Error notFound:{$xpath}");
-            return false;
+        $found = array_filter($spans, fn($span) => strpos($span,$findFor) > -1);
+        if($found){
+            return trim(explode($findFor, end($found))[1]);
+        }else{
+            return $default;
         }
     }
 }
