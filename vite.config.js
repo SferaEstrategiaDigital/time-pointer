@@ -8,7 +8,7 @@ export default defineConfig({
         cors: {
             origin: "*",
         },
-        https: true
+        // https: true
     },
     plugins: [
         laravel({

@@ -10,10 +10,10 @@ services:
             context: ./.docker/php/
             dockerfile: Dockerfile.dev
         restart: unless-stopped
-        working_dir: /var/www/html
+        working_dir: /var/www/
         volumes:
             - ./.docker/php/php.ini:/usr/local/etc/php/php.ini
-            - ./:/var/www/html
+            - ./:/var/www/
         networks:
             - qimovel-modernMonolith
         depends_on:
@@ -47,7 +47,7 @@ services:
         volumes:
             - ./.docker/nginx/conf.d:/etc/nginx/conf.d
             - ./.docker/nginx/logs:/var/log/nginx
-            - ./:/var/www/html
+            - ./:/var/www/
         networks:
             - qimovel-modernMonolith
 
@@ -57,9 +57,9 @@ services:
             args:
                 user: omarceleza
                 uid: 1000
-        working_dir: /var/www/html
+        working_dir: /var/www/
         volumes:
-            - ./:/var/www/html
+            - ./:/var/www/
             # - ${HOME}/.npm:${HOME}/.npm
         command: npm run dev
         ports:
@@ -69,12 +69,12 @@ services:
 
     npm:
         image: node:14-slim
-        working_dir: /var/www/html
+        working_dir: /var/www/
         entrypoint: ["npm"]
         profiles:
             - donotstart
         volumes:
-            - "./:/var/www/html"
+            - "./:/var/www/"
 
     supervisor:
         build:
@@ -84,7 +84,7 @@ services:
             context: .docker/supervisor
             dockerfile: Dockerfile.dev
         volumes:
-            - ./:/var/www/html
+            - ./:/var/www/
         networks:
             - qimovel-modernMonolith
         depends_on:
