@@ -28,4 +28,9 @@ class CaixaImovel extends Model
     {
         return $this->morphMany(Log::class, 'loggable');
     }
+
+    public function items()
+    {
+        return $this->belongsToMany(CaixaImovelsItem::class, 'caixa_imovels_caixa_imovels_items');
+    }
 }

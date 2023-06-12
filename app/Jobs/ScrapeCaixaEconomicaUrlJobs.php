@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\CaixaImovel;
+use App\Models\CaixaImovelsItem;
 use GuzzleHttp\Client;
 use App\Models\PropertyType;
 use Illuminate\Bus\Queueable;
@@ -20,12 +21,12 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
     protected $url = "https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnOrigem=index&hdnimovel=%s";
     protected $crawlerInstance;
+    protected $delString = "Ocorreu um erro ao tentar recuperar os dados do imóvel. O imóvel que você procura não está mais disponível para venda.";
 
     public function __construct(protected CaixaImovel $csvRow)
     {
         $this->csvRow = $csvRow;
         $this->url = sprintf($this->url, $this->csvRow->num_imovel);
-        Log::info("{$this->url}");
     }
 
     /**
@@ -33,36 +34,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
      */
     public function handle(): bool
     {
-        $csvRow = $this->csvRow;
-
-        $data = $this->getData();
-
-        // dd($data);
-
-        $tipoImovel = PropertyType::firstOrCreate([
-            'type' => $data['tipo_imovel']
-        ]);
-
-        try {
-            $csvRow->update([
-                'endereco' => $data['endereco'],
-                'insc_imobiliaria' => $data['insc_imobiliaria'],
-                'num_quartos' => $data['num_quartos'],
-                'averbacao_leiloes_negativos' => $data['averbacao_leiloes_negativos'],
-                'property_type_id' => $tipoImovel->id,
-                'detalhes' => $data['detalhes'],
-                'scrapped_at' => now(),
-            ]);
-        } catch (\Throwable $th) {
-            Log::critical("Scrape Error update:{$csvRow->id};{$th->getMessage()};" . json_encode($data));
-            Log::critical(json_encode($th->getTrace()));
-        }
-
-        return true;
-    }
-
-    protected function getData()
-    {
+        Log::info("{$this->url}");
         $csvRow = $this->csvRow;
 
         $client = new Client();
@@ -76,9 +48,52 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
         /* VERIFICA SE O STATUS DA RESPOSTA É 200 OU 301 */
         if (!in_array($response->getStatusCode(), ['200', '301'])) {
-            return;
+            return false;
         }
         $this->crawlerInstance = new Crawler((string)$response->getBody());
+
+        $deleted = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div/div');
+
+        if($deleted->count() && $deleted->text() == $this->delString){
+            Log::critical("Scrape Error recordDeleted: {$csvRow->id}");
+            return false;
+        }
+
+        $data = $this->getData();
+
+        foreach ($data as $item) {
+            $split = explode(":", $item, 2);
+            $caixaItem = CaixaImovelsItem::firstOrCreate([
+                'item' => trim($split[0], " \t\n\r\0\x0B)(")
+            ]);
+
+            $this->csvRow->items()->attach($caixaItem, [
+                'value' => trim($split[1], " \t\n\r\0\x0B)("),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        try {
+            $csvRow->update([
+                // 'endereco' => $data['endereco'],
+                // 'insc_imobiliaria' => $data['insc_imobiliaria'],
+                // 'num_quartos' => $data['num_quartos'],
+                // 'averbacao_leiloes_negativos' => $data['averbacao_leiloes_negativos'],
+                // 'property_type_id' => $tipoImovel->id,
+                // 'detalhes' => $data['detalhes'],
+                'scrapped_at' => now(),
+            ]);
+        } catch (\Throwable $th) {
+            Log::critical("Scrape Error update:{$csvRow->id};{$th->getMessage()};" . json_encode($data));
+            Log::critical(json_encode($th->getTrace()));
+        }
+
+        return true;
+    }
+
+    protected function getData()
+    {
 
         $data = [];
         // $valorVenda = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[2]/h4[2]');
@@ -87,42 +102,44 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
         $endereco = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[1]')
             ->html();
-        $data['endereco'] = explode('<br>', $endereco)[1];
+        // Add "Endereço:" no início pra seguir o padrão
+        $data[] = "Endereço:" . explode('<br>', $endereco)[1];
 
         // BUSCA PELO COMENTÁRIO ONDE DEFINE SE O IMÓVEL É OU NÃO OCUPADO
         $ocupacao = $this->crawlerInstance->filterXPath('//comment()')->each(function (Crawler $node, $i) {
             if (strpos($node->text(), 'span>') !== false) {
-                preg_match('/<strong>(.*?)<\/strong>/', $node->text(), $matches);
-                if(isset($matches[1])){
-                    return $matches[1];
-                }
+                return html_entity_decode(strip_tags("<{$node->text()}"));
             }
         });
 
         $ocupacao = array_filter($ocupacao);
-        $data['ocupacao'] = end($ocupacao);
+        $data[] = end($ocupacao);
 
         $spans = $this->crawlerInstance->filterXpath('//span')
             ->each(function ($node) {
                 if(strpos($node->text(), ':') || strpos($node->text(), '=')){
-                    return $node->text();
+                    return str_replace(" = ", ":",$node->text());
                 }
             });
-        // Remove os nulos
-        $spans = array_filter($spans);
+            
+            // Remove os nulos
+            $spans = array_filter($spans);
 
-        // dd($spans);
+            $infos = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[3]');
+            $infos = explode('<br>',$infos->html());
+            $infos = array_filter($infos);
+            $infos = array_map(fn($info) => "Forma de pagamento:" . trim(strip_tags($info)," \t\n\r\0\x0B&nbsp;"), $infos);
 
-        $data['num_quartos'] = $this->extractInfo($spans,"Quartos: ", 0);
-        $data['insc_imobiliaria'] = $this->extractInfo($spans, "Inscrição imobiliária: ", 0);
-        $data['averbacao_leiloes_negativos'] = $this->extractInfo($spans, "Averbação dos leilões negativos: ", 0);
-        $data['tipo_imovel'] = $this->extractInfo($spans, "Tipo de imóvel: ", 0);
+        // $data['num_quartos'] = $this->extractInfo($spans,"Quartos: ", 0);
+        // $data['insc_imobiliaria'] = $this->extractInfo($spans, "Inscrição imobiliária: ", 0);
+        // $data['averbacao_leiloes_negativos'] = $this->extractInfo($spans, "Averbação dos leilões negativos: ", 0);
+        // $data['tipo_imovel'] = $this->extractInfo($spans, "Tipo de imóvel: ", 0);
 
         $destaque = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div[1]/div/div[3]/p[2]');
 
-        $data['detalhes'] = $destaque->count() ? (strpos($destaque->text(), "Descrição:") > -1 ? trim(explode("Descrição:", $destaque->text())[1]) : "") : "";
+        $data[] = $destaque->count() ? $destaque->text() : "";
 
-        return $data;
+        return array_merge($data, $spans, $infos);
     }
 
     protected function extractInfo($spans, $findFor, $default = false)

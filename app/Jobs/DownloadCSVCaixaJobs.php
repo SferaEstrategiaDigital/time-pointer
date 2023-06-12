@@ -45,7 +45,7 @@ class DownloadCSVCaixaJobs implements ShouldQueue
             ]);
         } catch (\Throwable $th) {
             Log::critical("Falha ao baixar arquivo do estado {$estado->uf}");
-            log::critical(json_encode($th->getTrace()));
+            Log::critical(json_encode($th->getTrace()));
             return;
         }
 

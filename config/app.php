@@ -170,6 +170,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\PermissionServiceProvider::class,
         App\Providers\RoleServiceProvider::class,
+        App\Providers\CaixaImovelsItemServiceProvider::class,
     ])->toArray(),
 
     /*
