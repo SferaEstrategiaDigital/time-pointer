@@ -1,0 +1,12 @@
+#!/bin/bash
+
+. .env.docker
+
+DOCKER_COMPOSE=docker-compose.yml
+
+if [ "$DOCKER_ENVIRONMENT" == "dev" ]; then
+    echo -e "*******************\n* DESENVOLVIMENTO *\n*******************"
+    DOCKER_COMPOSE=docker-compose.dev.yml
+fi
+
+docker compose --file $DOCKER_COMPOSE --env-file .env.docker $*
