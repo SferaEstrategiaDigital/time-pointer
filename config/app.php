@@ -172,7 +172,8 @@ return [
         App\Providers\RoleServiceProvider::class,
         App\Providers\CaixaImovelsItemServiceProvider::class,
         App\Providers\NivelPagamentoServiceProvider::class,
-        App\Providers\PrazoExpiracaoServiceProvider::class
+        App\Providers\PrazoExpiracaoServiceProvider::class,
+        App\Providers\AssinaturaServiceProvider::class
     ])->toArray(),
 
     /*
