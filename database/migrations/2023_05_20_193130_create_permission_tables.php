@@ -34,7 +34,7 @@ class CreatePermissionTables extends Migration
             $table->nestedSet();
             $table->timestamps();
 
-            $table->unique(['slug', 'guard_name']);
+            // $table->unique(['slug', 'guard_name']);
         });
 
         Schema::create($tableNames['roles'], function (Blueprint $table) use ($teams, $columnNames) {
