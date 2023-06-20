@@ -32,8 +32,6 @@ class RunScrapeCaixaJob implements ShouldQueue
 
         foreach ($toScrape as $item) {
             ScrapeCaixaEconomicaUrlJobs::dispatch($item);
-            // sleep(rand(rand(3, 6), rand(8, 11)));
-            // sleep(1);
         }
         return true;
     }

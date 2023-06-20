@@ -19,7 +19,7 @@ class FilesCaixaEconomica extends Model
         return $this->belongsTo(EstadosBrasileiro::class);
     }
 
-    public function csvs()
+    public function imoveis()
     {
         return $this->hasMany(CaixaImovel::class);
     }

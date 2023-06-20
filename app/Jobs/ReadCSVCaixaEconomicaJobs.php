@@ -84,6 +84,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                     'nome' => strtoupper($columns[2]),
                 ]);
 
+            // LEMBRA DE REPARAR ABAIXO
             $valor_venda = str_replace(',', '.', str_replace('.', '', $columns[5]));
 
             // Em casos onde há ponto-e-vírgula no endereço usar outra forma de extrair as colunas.
@@ -103,11 +104,11 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                 // Colunas refeitas
                 $columns = array_merge($damagedRow, [$address], $restRow);
 
-                // Repara o "valor de venda"
+                // Repara o "valor de venda", LEMBRA DE REPARAR ACIMA
                 $valor_venda = trim(str_replace(',', '.', str_replace('.', '', $columns[5])));
             }
 
-            $file->csvs()->create([
+            $file->imoveis()->create([
                 'num_imovel' => $num_imovel,
                 'bairro' => iconv("ISO-8859-1", "UTF-8", $columns[3]),
                 'endereco' => iconv("ISO-8859-1", "UTF-8", $columns[4]),
