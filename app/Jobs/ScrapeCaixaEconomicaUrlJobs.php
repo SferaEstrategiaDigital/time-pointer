@@ -21,7 +21,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
     protected $url = "https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnOrigem=index&hdnimovel=%s";
     protected $crawlerInstance;
-    protected $delString = "Ocorreu um erro ao tentar recuperar os dados do imóvel. O imóvel que você procura não está mais disponível para venda.";
+    protected $delString = "O imóvel que você procura não está mais disponível para venda";
 
     public function __construct(protected CaixaImovel $csvRow)
     {
@@ -54,7 +54,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
         $deleted = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div/div');
 
-        if($deleted->count() && $deleted->text() == $this->delString){
+        if ($deleted->count() && strpos($deleted->text(), "$this->delString") > -1) {
             Log::critical("Scrape Error recordDeleted: {$csvRow->id}");
             return false;
         }
@@ -76,12 +76,6 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
         try {
             $csvRow->update([
-                // 'endereco' => $data['endereco'],
-                // 'insc_imobiliaria' => $data['insc_imobiliaria'],
-                // 'num_quartos' => $data['num_quartos'],
-                // 'averbacao_leiloes_negativos' => $data['averbacao_leiloes_negativos'],
-                // 'property_type_id' => $tipoImovel->id,
-                // 'detalhes' => $data['detalhes'],
                 'scrapped_at' => now(),
             ]);
         } catch (\Throwable $th) {
@@ -117,18 +111,18 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
         $spans = $this->crawlerInstance->filterXpath('//span')
             ->each(function ($node) {
-                if(strpos($node->text(), ':') || strpos($node->text(), '=')){
-                    return str_replace(" = ", ":",$node->text());
+                if (strpos($node->text(), ':') || strpos($node->text(), '=')) {
+                    return str_replace(" = ", ":", $node->text());
                 }
             });
-            
-            // Remove os nulos
-            $spans = array_filter($spans);
 
-            $infos = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[3]');
-            $infos = explode('<br>',$infos->html());
-            $infos = array_filter($infos);
-            $infos = array_map(fn($info) => "Forma de pagamento:" . trim(strip_tags($info)," \t\n\r\0\x0B&nbsp;"), $infos);
+        // Remove os nulos
+        $spans = array_filter($spans);
+
+        $infos = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[3]');
+        $infos = explode('<br>', $infos->html());
+        $infos = array_filter($infos);
+        $infos = array_map(fn ($info) => "Forma de pagamento:" . trim(strip_tags($info), " \t\n\r\0\x0B&nbsp;"), $infos);
 
         // $data['num_quartos'] = $this->extractInfo($spans,"Quartos: ", 0);
         // $data['insc_imobiliaria'] = $this->extractInfo($spans, "Inscrição imobiliária: ", 0);
@@ -144,10 +138,10 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
     protected function extractInfo($spans, $findFor, $default = false)
     {
-        $found = array_filter($spans, fn($span) => strpos($span,$findFor) > -1);
-        if($found){
+        $found = array_filter($spans, fn ($span) => strpos($span, $findFor) > -1);
+        if ($found) {
             return trim(explode($findFor, end($found))[1]);
-        }else{
+        } else {
             return $default;
         }
     }

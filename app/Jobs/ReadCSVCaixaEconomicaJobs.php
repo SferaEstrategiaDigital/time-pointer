@@ -38,6 +38,8 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
     {
         $file = $this->file;
 
+        // $estadoBras = $file->estado()->first(); // para buscar os registros de ImovelCaixa que esta ativos
+
         if ($file->failed === 0) {
             Log::critical("Arquivo {$file->uuid} já processado em {$file->processed_at}");
             die;
@@ -46,11 +48,13 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
         $file->update([
             'failed' => 1
         ]);
-        $data = Storage::get("./Caixa/CSVs/{$file->uuid}.csv");
+        $data = Storage::get("./Caixa/CSVs/{$file->filename}");
         if (!$data) {
             Log::critical("Arquivo não encontrado {$file->uuid}");
             die;
         }
+
+        $changed = collect();
 
         $data = explode(PHP_EOL, $data);
         foreach ($data as $index => $row) {
@@ -108,7 +112,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                 $valor_venda = trim(str_replace(',', '.', str_replace('.', '', $columns[5])));
             }
 
-            $file->imoveis()->create([
+            $newReg = $file->imoveis()->create([
                 'num_imovel' => $num_imovel,
                 'bairro' => iconv("ISO-8859-1", "UTF-8", $columns[3]),
                 'endereco' => iconv("ISO-8859-1", "UTF-8", $columns[4]),
@@ -120,11 +124,26 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                 'md5_row' => $md5Row,
             ]);
 
+            $changed->add([
+                $oldReg,
+                $newReg
+            ]);
+
+            // Log::info($oldReg->tojson());
+            // Log::info($newReg->tojson());
+
             // $url = $columns[10]; // TODO: analisar no futuro a URL
         }
         $file->update([
             'failed' => 0,
             'processed_at' => now()
         ]);
+
+        // Ao ler o arquivo, vrificar como apagar editar e adicionar imoveis
+        // Buscar por imoveis onde o estado e o banco é o mesmo
+
+        // [null, ImovelCaixa] => ImovelCaixa novo
+        // [ImovelCaixa, null] => Não vai acontecer, pq a base é o arquivo e não os registros antigos
+        // [ImovelCaixa, ImovelCaixa] => ImovelCaixa atualizado
     }
 }

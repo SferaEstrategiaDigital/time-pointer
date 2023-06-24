@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\FilesCaixaEconomica;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
@@ -31,17 +32,15 @@ class DownloadCSVCaixaJobs implements ShouldQueue
         $client = new Client([
             'verify' => false,
         ]);
-        $path = storage_path("app/Caixa/CSVs");
 
-        if (!file_exists($path)) {
-            mkdir($path, 0775, true);
-        }
+        $path = FilesCaixaEconomica::filePath();
 
         $fileName = (string)Str::uuid();
+        $fullPath = $path . "/{$fileName}.csv";
 
         try {
             $client->request('GET', sprintf($this->url, $estado->uf), [
-                'sink' => $path . "/{$fileName}.csv"
+                'sink' => $fullPath
             ]);
         } catch (\Throwable $th) {
             Log::critical("Falha ao baixar arquivo do estado {$estado->uf}");
@@ -52,7 +51,7 @@ class DownloadCSVCaixaJobs implements ShouldQueue
 
         $file = $estado->filesCaixaEconomica()->create([
             'uuid' => $fileName,
-            'md5' => md5_file($path . "/{$fileName}.csv")
+            'md5' => md5_file($fullPath)
         ]);
 
         ReadCSVCaixaEconomicaJobs::dispatch($file);

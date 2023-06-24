@@ -33,4 +33,9 @@ class CaixaImovel extends Model
     {
         return $this->belongsToMany(CaixaImovelsItem::class, 'caixa_imovels_caixa_imovels_items');
     }
+
+    public function imovel()
+    {
+        return $this->morphMany(Imovel::class, 'imovel');
+    }
 }

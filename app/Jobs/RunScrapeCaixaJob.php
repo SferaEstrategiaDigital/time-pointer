@@ -28,9 +28,15 @@ class RunScrapeCaixaJob implements ShouldQueue
     public function handle(): bool
     {
         // whereNull('scrapped_at')->
-        $toScrape = CaixaImovel::inRandomOrder()->get();
+        $toScrape = CaixaImovel::query();
 
-        foreach ($toScrape as $item) {
+        if (true) {
+            $toScrape->where('files_caixa_economica_id', 17);
+        }
+
+        $toScrape->inRandomOrder();
+
+        foreach ($toScrape->get() as $item) {
             ScrapeCaixaEconomicaUrlJobs::dispatch($item);
         }
         return true;
