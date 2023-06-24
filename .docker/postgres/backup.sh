@@ -17,7 +17,7 @@ echo "localhost:5432:${POSTGRES_DB}:${POSTGRES_USER}:${POSTGRES_PASSWORD}" > "$P
 
 chmod 0600 "$PGPASS_FILE"
 
-pg_dump --username "$POSTGRES_USER" --file="$BACKUP_FILE" "$POSTGRES_DB" --exclude-table *jobs*
+pg_dump --username "$POSTGRES_USER" --file="$BACKUP_FILE" "$POSTGRES_DB"
 
 rm "$PGPASS_FILE"
 
