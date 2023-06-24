@@ -5,7 +5,7 @@ set -e
 BACKUP_DIR="/backups"
 mkdir -p "$BACKUP_DIR"
 
-echo -e "*\n!.gitignore" >> "$BACKUP_DIR/.gitignore"
+echo -e "*\n!.gitignore" > "$BACKUP_DIR/.gitignore"
 
 BACKUP_FILE="$BACKUP_DIR/backup_$(date +'%Y%m%d_%H%M%S').sql"
 
