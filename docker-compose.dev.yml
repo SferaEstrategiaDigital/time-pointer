@@ -15,26 +15,30 @@ services:
             - ./.docker/php/php.ini:/usr/local/etc/php/php.ini
             - ./:/var/www/
         networks:
-            - qimovel-modernMonolith
+            - ${DOCKER_NETWORK_NAME}
         depends_on:
             - db
 
     db:
-        image: postgres:14.5
-        restart: unless-stopped
+        build:
+            args:
+                user: ${DOCKER_PERMISSION_USER}
+                uid: ${DOCKER_PERMISSION_UID}
+            context: .docker/postgres/
         environment:
             POSTGRES_PASSWORD: root
             POSTGRES_USER: root
-            POSTGRES_DB: qimovel-modernMonolith_app
+            POSTGRES_DB: ${DOCKER_NETWORK_NAME}
             TZ: "America/Sao_Paulo"
         networks:
-            - qimovel-modernMonolith
-
+            - ${DOCKER_NETWORK_NAME}
         ports:
             - "5432:5432"
         volumes:
             - "pg_data:/var/lib/postgresql/data"
+            - "./storage/database_backups:/backups"
             # - ./.docker/postgres/init/init.sql:/docker-entrypoint-initdb.d/db.sql
+        restart: unless-stopped
 
     nginx:
         image: nginx:alpine
@@ -49,7 +53,7 @@ services:
             - ./.docker/nginx/logs:/var/log/nginx
             - ./:/var/www/
         networks:
-            - qimovel-modernMonolith
+            - ${DOCKER_NETWORK_NAME}
 
     node:
         build:
@@ -86,12 +90,12 @@ services:
         volumes:
             - ./:/var/www/
         networks:
-            - qimovel-modernMonolith
+            - ${DOCKER_NETWORK_NAME}
         depends_on:
             - app
 
 networks:
-    qimovel-modernMonolith:
+    investCubo:
         driver: bridge
 
 volumes:

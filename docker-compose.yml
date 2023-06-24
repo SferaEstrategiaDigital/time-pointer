@@ -34,6 +34,7 @@ services:
             - "5432:5432"
         volumes:
             - "./.docker/pgsql/pg_data:/var/lib/postgresql/data"
+            - "./storage/database_backups:/backups"
 
     nginx:
         image: nginx:alpine
