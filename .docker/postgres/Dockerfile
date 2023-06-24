@@ -14,4 +14,7 @@ RUN ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 COPY backup.sh /backup
 RUN chmod +x /backup
 
+COPY restore.sh /restore
+RUN chmod +x /restore
+
 # USER $user
