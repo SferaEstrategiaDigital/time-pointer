@@ -1,30 +1,25 @@
 <template>
     <div class="hidden md:flex space-x-6 pl-10 mt-4">
         <div
-            class="flex flex-col bg-green-100 px-2 py-0.5 rounded-lg cursor-pointer"
-            title="Clique aqui para alterar"
+            class="flex flex-col items-start bg-green-100 px-2 py-0.5 rounded-lg"
         >
             <Tooltip class="flex items-center">
                 <template #title>
                     <span class="font-bold">Ordenar por:</span
-                    ><span class="ml-2">Mais relevantes</span></template
+                    ><span class="ml-2">{{
+                        filterItems.order.title
+                    }}</span></template
                 >
                 <template #content>
-                    <ul class="bg-white rounded-lg overflow-hidden mt-2 w-">
-                        <li class="p-1 box-border border bg-green-600">
-                            Menor valor
-                        </li>
-                        <li class="p-1 box-border border bg-green-600">
-                            Maior valor
-                        </li>
-                        <li class="p-1 box-border border bg-green-600">
-                            Mais relevantes
-                        </li>
-                        <li class="p-1 box-border border bg-green-600">
-                            Menor desconto
-                        </li>
-                        <li class="p-1 box-border border bg-green-600">
-                            Maior desconto
+                    <ul
+                        class="bg-white rounded-lg overflow-hidden mt-2 space-y-1"
+                    >
+                        <li
+                            v-for="item in filters.order"
+                            class="list-item"
+                            @click="filter('order', item.id)"
+                        >
+                            {{ item.title }}
                         </li>
                     </ul>
                 </template>
@@ -32,13 +27,21 @@
         </div>
 
         <div
-            class="flex flex-col bg-green-100 px-2 py-0.5 rounded-lg cursor-pointer"
+            class="flex flex-col px-2 py-0.5 bg-green-100 rounded-lg cursor-pointer relative"
             title="Clique aqui para alterar"
         >
-            <div class="flex items-center">
-                <span class="font-bold">Valores entre:</span>
-                <small class="ml-2">R$ 10000,00 e R$ 1000000,00</small>
-            </div>
+            <Tooltip class="flex items-center" :click-to-show="true">
+                <template #title>
+                    <span class="font-bold">Valores entre:</span>
+                    <small class="ml-2"
+                        >R$ 10000,00 e R$ 1000000,00</small
+                    ></template
+                >
+                <template #content>
+                    <input type="text" name="" id="" />
+                    <input type="text" name="" id="" />
+                </template>
+            </Tooltip>
         </div>
     </div>
     <div
@@ -59,8 +62,44 @@ import Tooltip from "../Tooltip.vue";
 
 let searchInput = ref("");
 
+const filters = ref({
+    order: [
+        {
+            id: "menor_valor",
+            title: "Menor valor",
+        },
+        {
+            id: "maior_valor",
+            title: "Maior valor",
+        },
+        {
+            id: "mais_relevantes",
+            title: "Mais relevantes",
+        },
+        {
+            id: "menor_desconto",
+            title: "Menor desconto",
+        },
+        {
+            id: "maior_desconto",
+            title: "Maior desconto",
+        },
+    ],
+});
+
+const priceVisibility = false;
+
+const filterItems = ref({
+    order: filters.value.order[0],
+    priceBetween: [0, 0],
+});
+
 const search = () => {
     console.log(`Pesquisando: ${searchInput.value}`);
+};
+
+const filter = (id, option) => {
+    filterItems.value[id] = filters.value[id].filter((v) => v.id === option)[0];
 };
 
 let searchResults = ref([
@@ -117,3 +156,9 @@ let searchResults = ref([
     },
 ]);
 </script>
+
+<style scoped>
+.list-item {
+    @apply p-1 box-border border bg-green-600 cursor-pointer;
+}
+</style>
