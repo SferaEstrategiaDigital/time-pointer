@@ -1,12 +1,12 @@
 <template>
     <div class="bg-gray-100">
         <div class="p-6 bg-white rounded shadow w-full">
-            <div class="mt-8">
+            <div class="mt-5">
                 <div class="relative">
                     <input
-                        class="w-full pl-10 pr-4 py-2 rounded-lg shadow border-0 outline-none ring-green-800 font-medium"
+                        class="w-full pl-10 pr-4 py-2 rounded-lg shadow border border-slate-900 hover:border-orange-700 outline-none ring-green-800 font-medium"
                         type="search"
-                        placeholder="Buscar por imóvel"
+                        placeholder="Buscar por imóvel, cidade, tipo de imóvel e estado"
                         v-model="searchInput"
                     />
                     <div class="absolute left-0 top-0 mt-2 ml-3">
