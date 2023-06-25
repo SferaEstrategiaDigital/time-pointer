@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\EstadosBrasileiro;
 use App\Models\FilesCaixaEconomica;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
@@ -19,14 +20,14 @@ class DownloadCSVCaixaJobs implements ShouldQueue
 
     protected $url = "https://venda-imoveis.caixa.gov.br/listaweb/Lista_imoveis_%s.csv";
 
-    public function __construct(protected $estado)
+    public function __construct(protected EstadosBrasileiro $estado)
     {
     }
 
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(): bool
     {
         $estado = $this->estado;
         $client = new Client([
@@ -43,17 +44,29 @@ class DownloadCSVCaixaJobs implements ShouldQueue
                 'sink' => $fullPath
             ]);
         } catch (\Throwable $th) {
-            Log::critical("Falha ao baixar arquivo do estado {$estado->uf}");
+            Log::critical("Falha ao baixar arquivo do estado {$estado->uf};{$th->getMessage()}");
             Log::critical(json_encode($th->getTrace()));
-            return;
+            return false;
+        }
+
+        $md5_file = md5_file($fullPath);
+
+        $md5_check = $estado->filesCaixaEconomica()->where('md5', $md5_file)->count();
+
+        if ($md5_check) {
+            Log::critical("Já existe arquivo com o mesmo MD5");
+            unlink($fullPath);
+            return false;
         }
 
 
         $file = $estado->filesCaixaEconomica()->create([
             'uuid' => $fileName,
-            'md5' => md5_file($fullPath)
+            'md5' => $md5_file
         ]);
 
         ReadCSVCaixaEconomicaJobs::dispatch($file);
+
+        return true;
     }
 }

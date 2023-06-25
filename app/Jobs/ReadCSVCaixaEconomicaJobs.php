@@ -23,26 +23,26 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected $file = null)
+    public function __construct(protected ?FilesCaixaEconomica $file = null)
     {
-        if (!$file) {
-            $this->file = FilesCaixaEconomica::whereNull('failed')
-                ->orderBy('created_at')->first();
-        }
     }
 
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(): bool
     {
         $file = $this->file;
+        if (!$file) {
+            Log::critical("Não foi possível processar o FilesCaixaEconomica (" . json_encode($file) . ")");
+            return false;
+        }
 
         // $estadoBras = $file->estado()->first(); // para buscar os registros de ImovelCaixa que esta ativos
 
         if ($file->failed === 0) {
             Log::critical("Arquivo {$file->uuid} já processado em {$file->processed_at}");
-            die;
+            return false;
         }
 
         $file->update([
@@ -51,7 +51,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
         $data = Storage::get("./Caixa/CSVs/{$file->filename}");
         if (!$data) {
             Log::critical("Arquivo não encontrado {$file->uuid}");
-            die;
+            return false;
         }
 
         $changed = collect();
@@ -138,6 +138,8 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
             'failed' => 0,
             'processed_at' => now()
         ]);
+
+        return true;
 
         // Ao ler o arquivo, vrificar como apagar editar e adicionar imoveis
         // Buscar por imoveis onde o estado e o banco é o mesmo
