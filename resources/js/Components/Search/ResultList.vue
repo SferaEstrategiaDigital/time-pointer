@@ -33,13 +33,22 @@
             <Tooltip class="flex items-center" :click-to-show="true">
                 <template #title>
                     <span class="font-bold">Valores entre:</span>
-                    <small class="ml-2"
-                        >R$ 10000,00 e R$ 1000000,00</small
+                    <small class="ml-2" v-if="filterItems.priceBetween[0]"
+                        >R$ {{ filterItems.priceBetween[0] }}</small
+                    >
+                    <small v-if="filterItems.priceBetween[1]">
+                        e R$ {{ filterItems.priceBetween[1] }}</small
                     ></template
                 >
                 <template #content>
-                    <input type="text" name="" id="" />
-                    <input type="text" name="" id="" />
+                    <InputMaskMoney
+                        placeholder="R$ "
+                        v-model="filterItems.priceBetween[0]"
+                    />
+                    <InputMaskMoney
+                        placeholder="R$ "
+                        v-model="filterItems.priceBetween[1]"
+                    />
                 </template>
             </Tooltip>
         </div>
@@ -59,6 +68,8 @@
 import { ref } from "vue";
 import ResultItem from "./ResultItem.vue";
 import Tooltip from "../Tooltip.vue";
+
+import InputMaskMoney from "../InputMaskMoney.vue";
 
 let searchInput = ref("");
 
