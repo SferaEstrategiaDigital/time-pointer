@@ -16,7 +16,9 @@
                     </div>
                 </div>
             </div>
-            <div class="flex justify-between mt-4 w-2/6 mx-auto">
+            <div
+                class="flex justify-evenly md:justify-between mt-4 w-full md:w-2/6 mx-auto"
+            >
                 <button
                     class="bg-orange-500 text-white font-bold p-2 rounded hover:bg-orange-600"
                     @click="search()"
