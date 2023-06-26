@@ -27,28 +27,46 @@
         </div>
 
         <div
-            class="flex flex-col px-2 py-0.5 bg-green-100 rounded-lg cursor-pointer relative"
+            class="flex flex-col px-2 py-0.5 bg-green-100 rounded-lg cursor-pointer relative min-w-[20rem]"
             title="Clique aqui para alterar"
         >
             <Tooltip class="flex items-center" :click-to-show="true">
                 <template #title>
                     <span class="font-bold">Valores entre:</span>
                     <small class="ml-2" v-if="filterItems.priceBetween[0]"
-                        >R$ {{ filterItems.priceBetween[0] }}</small
+                        >R$
+                        {{
+                            Number(
+                                filterItems.priceBetween[0].replace(",", ".")
+                            )
+                                .toFixed(2)
+                                .replace(".", ",")
+                        }}</small
                     >
                     <small v-if="filterItems.priceBetween[1]">
-                        e R$ {{ filterItems.priceBetween[1] }}</small
+                        e R$
+                        {{
+                            Number(
+                                filterItems.priceBetween[1].replace(",", ".")
+                            )
+                                .toFixed(2)
+                                .replace(".", ",")
+                        }}</small
                     ></template
                 >
                 <template #content>
-                    <InputMaskMoney
-                        placeholder="R$ "
-                        v-model="filterItems.priceBetween[0]"
-                    />
-                    <InputMaskMoney
-                        placeholder="R$ "
-                        v-model="filterItems.priceBetween[1]"
-                    />
+                    <div class="flex w-full">
+                        <InputMaskMoney
+                            class="w-1/2"
+                            placeholder="R$ "
+                            v-model="filterItems.priceBetween[0]"
+                        />
+                        <InputMaskMoney
+                            class="w-1/2"
+                            placeholder="R$ "
+                            v-model="filterItems.priceBetween[1]"
+                        />
+                    </div>
                 </template>
             </Tooltip>
         </div>
