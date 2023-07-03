@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('property_types', function (Blueprint $table) {
             $table->id();
             $table->string('type');
+            $table->string("background_color")->nullable();
+            $table->string("foreground_color")->nullable();
             $table->timestamps();
         });
     }

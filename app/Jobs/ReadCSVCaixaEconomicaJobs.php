@@ -56,6 +56,20 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
 
         $changed = collect();
 
+        // 45 linhas
+        // Novos
+        // Não mudaram
+
+        // imovels_caixa
+
+
+        // Temp_imovels_caixa
+        // Scrape, mudar em Imovels
+
+
+        // imovels 
+        // 50 regs
+
         $data = explode(PHP_EOL, $data);
         foreach ($data as $index => $row) {
             // index deve comecar no 4 por causa do cabeçalho do arquivo, ou se a linha for vazia
@@ -143,6 +157,8 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
 
         // Ao ler o arquivo, vrificar como apagar editar e adicionar imoveis
         // Buscar por imoveis onde o estado e o banco é o mesmo
+
+        // Buscar os imovels do estado e contar com a quantidade de imovels_caixa
 
         // [null, ImovelCaixa] => ImovelCaixa novo
         // [ImovelCaixa, null] => Não vai acontecer, pq a base é o arquivo e não os registros antigos
