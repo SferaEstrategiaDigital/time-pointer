@@ -50,7 +50,7 @@ const showingNavigationDropdown = ref(false);
                                     Dashboard
                                 </NavLink>
                                 <NavLink
-                                    v-if="can('usuarios.visualizar')"
+                                    v-if="can('configuracoes.usuarios.acessar')"
                                     :href="route('usuarios.index')"
                                     :active="route().current('usuarios.index')"
                                 >
@@ -96,7 +96,7 @@ const showingNavigationDropdown = ref(false);
                                         <DropdownLink
                                             v-if="
                                                 can(
-                                                    'sistema.funcoes.visualizar'
+                                                    'configuracoes.funcoes.acessar'
                                                 )
                                             "
                                             :href="route('funcoes.index')"
@@ -106,7 +106,7 @@ const showingNavigationDropdown = ref(false);
                                         <DropdownLink
                                             v-if="
                                                 can(
-                                                    'sistema.permissoes.visualizar'
+                                                    'configuracoes.permissoes.acessar'
                                                 )
                                             "
                                             :href="route('permissoes.index')"
