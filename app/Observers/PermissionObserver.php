@@ -13,7 +13,7 @@ class PermissionObserver
     public function creating(Permission $permission): void
     {
         $permission->uuid = (string)Str::uuid();
-        $permission->slug = Str::slug($permission->name);
+        $permission->name = Str::slug($permission->title);
     }
 
     /**
@@ -22,9 +22,9 @@ class PermissionObserver
     public function created(Permission $permission): void
     {
         if ($permission->ancestors->count()) {
-            $slugPath = $permission->ancestors->last();
-            $slugPath = $slugPath->slug . '.' . $permission->slug;
-            $permission->slug = $slugPath;
+            $namePath = $permission->ancestors->last();
+            $namePath = $namePath->name . '.' . $permission->name;
+            $permission->name = $namePath;
             $permission->save();
         }
     }

@@ -22,8 +22,8 @@ class PermissionsSeeder extends Seeder
     public function createNode($info, $parentId = null)
     {
         $node = Permission::create([
-            'slug' => $info->slug,
             'name' => $info->name,
+            'title' => $info->title,
             'parent_id' => $parentId,
         ]);
 

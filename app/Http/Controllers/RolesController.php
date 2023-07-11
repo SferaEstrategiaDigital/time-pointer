@@ -38,7 +38,7 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
-        $role = Role::create(['name' => $request->input('name')]);
+        $role = Role::create(['name' => $request->input('name'), 'title' => $request->input('name')]);
         $perms = Permission::whereIn('uuid', $request->input('permissions'))->get();
         $role->givePermissionTo($perms);
 
@@ -68,7 +68,7 @@ class RolesController extends Controller
      */
     public function update(Request $request, Role $funco)
     {
-        $funco->update(['name' => $request->input('name')]);
+        $funco->update(['name' => $request->input('name'), 'title' => $request->input('name')]);
         $perms = Permission::whereIn('uuid', $request->input('permissions'))->get();
         $funco->syncPermissions($perms);
 

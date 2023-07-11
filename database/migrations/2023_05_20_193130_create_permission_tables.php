@@ -29,12 +29,12 @@ class CreatePermissionTables extends Migration
             $table->bigIncrements('id'); // permission id
             $table->uuid();
             $table->string('name');       // For MySQL 8.0 use string('name', 125);
-            $table->text('slug');
+            $table->text('title');         // For MySQL 8.0 use string('name', 125);
             $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
             $table->nestedSet();
             $table->timestamps();
 
-            // $table->unique(['slug', 'guard_name']);
+            // $table->unique(['title', 'guard_name']);
         });
 
         Schema::create($tableNames['roles'], function (Blueprint $table) use ($teams, $columnNames) {
@@ -45,13 +45,14 @@ class CreatePermissionTables extends Migration
             }
             $table->uuid();
             $table->string('name');       // For MySQL 8.0 use string('name', 125);
-            $table->text('slug');
+            $table->text('title');         // For MySQL 8.0 use string('name', 125);
+            $table->text('homepage')->nullable()->default('UserDashboard');
             $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
             $table->timestamps();
             if ($teams || config('permission.testing')) {
                 $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
             } else {
-                $table->unique(['slug', 'guard_name']);
+                $table->unique(['title', 'guard_name']);
             }
         });
 

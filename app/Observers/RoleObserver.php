@@ -13,15 +13,15 @@ class RoleObserver
     public function creating(Role $role): void
     {
         $role->uuid = (string)Str::uuid();
-        $role->slug = Str::slug($role->name);
+        $role->name = Str::slug($role->title);
     }
 
     /**
      * Handle the Role "updated" event.
      */
-    public function updated(Role $role): void
+    public function updating(Role $role): void
     {
-        //
+        $role->name = Str::slug($role->title);
     }
 
     /**

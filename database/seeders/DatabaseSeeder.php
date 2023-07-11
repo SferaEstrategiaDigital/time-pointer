@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             EstadosBrasileirosSeeder::class,
             RolesSeeder::class,
             PermissionsSeeder::class,
+            UserSeeder::class
         ]);
     }
 }

@@ -12,7 +12,7 @@
             <label
                 :for="item.caminho"
                 class="ml-2 cursor-pointer"
-                :title="item.caminho"
+                :title="item.title"
                 >{{ item.name }}</label
             >
             <button

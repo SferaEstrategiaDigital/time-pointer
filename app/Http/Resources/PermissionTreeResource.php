@@ -16,8 +16,8 @@ class PermissionTreeResource extends JsonResource
     {
         return [
             'id' => $this->uuid,
-            'name' => $this->name,
-            'caminho' => $this->slug,
+            'name' => $this->title,
+            'caminho' => $this->name,
             'sub' => PermissionTreeResource::collection($this->whenLoaded('children')),
         ];
     }
