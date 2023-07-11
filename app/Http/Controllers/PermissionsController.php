@@ -43,7 +43,9 @@ class PermissionsController extends Controller
     public function store(Request $request)
     {
         $data = [
-            'name' => $request->input('name')
+            'name' => $request->input('name'),
+            'title' => $request->input('name')
+
         ];
 
         if ($request->input('parent')) {
