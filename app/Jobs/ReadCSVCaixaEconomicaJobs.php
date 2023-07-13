@@ -38,8 +38,6 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
             return false;
         }
 
-        // $estadoBras = $file->estado()->first(); // para buscar os registros de ImovelCaixa que esta ativos
-
         if ($file->failed === 0) {
             Log::critical("Arquivo {$file->uuid} já processado em {$file->processed_at}");
             return false;
@@ -54,21 +52,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
             return false;
         }
 
-        $changed = collect();
-
-        // 45 linhas
-        // Novos
-        // Não mudaram
-
-        // imovels_caixa
-
-
-        // Temp_imovels_caixa
-        // Scrape, mudar em Imovels
-
-
-        // imovels 
-        // 50 regs
+        // $newProperties = collect();
 
         $data = explode(PHP_EOL, $data);
         foreach ($data as $index => $row) {
@@ -138,13 +122,9 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                 'md5_row' => $md5Row,
             ]);
 
-            $changed->add([
-                $oldReg,
-                $newReg
-            ]);
+            // $newProperties->push($newReg);
 
-            // Log::info($oldReg->tojson());
-            // Log::info($newReg->tojson());
+            ScrapeCaixaEconomicaUrlJobs::dispatch($newReg);
 
             // $url = $columns[10]; // TODO: analisar no futuro a URL
         }
@@ -152,6 +132,8 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
             'failed' => 0,
             'processed_at' => now()
         ]);
+
+        // if ($newProperties->count()) {}
 
         return true;
 
