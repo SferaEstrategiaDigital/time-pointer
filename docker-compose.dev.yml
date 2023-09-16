@@ -17,28 +17,56 @@ services:
         networks:
             - ${DOCKER_NETWORK_NAME}
         depends_on:
-            - db
+            - dbPrincipal
+            - dbA
+            - dbB
 
-    db:
-        build:
-            args:
-                user: ${DOCKER_PERMISSION_USER}
-                uid: ${DOCKER_PERMISSION_UID}
-            context: .docker/postgres/
+
+    dbPrincipal:
+        image: postgres:14.5
+        restart: unless-stopped
         environment:
             POSTGRES_PASSWORD: root
             POSTGRES_USER: root
-            POSTGRES_DB: ${DOCKER_NETWORK_NAME}
-            TZ: "America/Sao_Paulo"
+            POSTGRES_DB: investcubo-modernMonolith_app
         networks:
             - ${DOCKER_NETWORK_NAME}
         ports:
             - "5432:5432"
         volumes:
-            - "pg_data:/var/lib/postgresql/data"
+            - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataPrincipal"
             - "./storage/database_backups:/backups"
-            # - ./.docker/postgres/init/init.sql:/docker-entrypoint-initdb.d/db.sql
+
+    dbA:
+        image: postgres:14.5
         restart: unless-stopped
+        environment:
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+            POSTGRES_DB: investcubo-modernMonolith_appA
+        networks:
+            - ${DOCKER_NETWORK_NAME}
+        ports:
+            - "5433:5432"
+        volumes:
+            - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataA"
+            - "./storage/database_backups:/backups"
+
+    dbB:
+        image: postgres:14.5
+        restart: unless-stopped
+        environment:
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+            POSTGRES_DB: investcubo-modernMonolith_appBS
+        networks:
+            - ${DOCKER_NETWORK_NAME}
+        ports:
+            - "5434:5432"
+        volumes:
+            - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataB"
+            - "./storage/database_backups:/backups"
+
 
     nginx:
         image: nginx:alpine
