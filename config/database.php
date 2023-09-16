@@ -78,6 +78,36 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'pgsqlA' => [
+            'driver' => 'pgsql',
+            'url' => env('DATABASE_URL_BANCOA'),
+            'host' => env('DB_HOST_BANCOA', '127.0.0.1'),
+            'port' => env('DB_PORT_BANCOA', '5432'),
+            'database' => env('DB_DATABASE_BANCOA', 'forge'),
+            'username' => env('DB_USERNAME_BANCOA', 'forge'),
+            'password' => env('DB_PASSWORD_BANCOA', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
+        'pgsqlB' => [
+            'driver' => 'pgsql',
+            'url' => env('DATABASE_URL_BANCOB'),
+            'host' => env('DB_HOST_BANCOB', '127.0.0.1'),
+            'port' => env('DB_PORT_BANCOB', '5432'),
+            'database' => env('DB_DATABASE_BANCOB', 'forge'),
+            'username' => env('DB_USERNAME_BANCOB', 'forge'),
+            'password' => env('DB_PASSWORD_BANCOB', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
@@ -125,7 +155,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [
