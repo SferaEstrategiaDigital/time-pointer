@@ -34,7 +34,8 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataPrincipal"
+            # - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataPrincipal"
+            - "pg_data:/var/lib/postgresql/data"
             - "./storage/database_backups:/backups"
 
     dbA:
@@ -43,13 +44,14 @@ services:
         environment:
             POSTGRES_PASSWORD: root
             POSTGRES_USER: root
-            POSTGRES_DB: investcubo-modernMonolith_appA
+            POSTGRES_DB: investcubo-modernMonolith_app
         networks:
             - ${DOCKER_NETWORK_NAME}
         ports:
             - "5433:5432"
         volumes:
-            - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataA"
+            # - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataA"
+            - "pg_dataA:/var/lib/postgresql/data"
             - "./storage/database_backups:/backups"
 
     dbB:
@@ -58,13 +60,14 @@ services:
         environment:
             POSTGRES_PASSWORD: root
             POSTGRES_USER: root
-            POSTGRES_DB: investcubo-modernMonolith_appBS
+            POSTGRES_DB: investcubo-modernMonolith_app
         networks:
             - ${DOCKER_NETWORK_NAME}
         ports:
             - "5434:5432"
         volumes:
-            - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataB"
+            # - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataB"
+            - "pg_dataB:/var/lib/postgresql/data"
             - "./storage/database_backups:/backups"
 
 
@@ -130,3 +133,5 @@ volumes:
         # driver_opts:
         #     type: tmpfs
         #     device: tmpfs
+    pg_dataA:
+    pg_dataB:
