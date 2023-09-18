@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\DynamicConnection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Imovel extends Model
 {
-    use HasFactory, SoftDeletes;
+    // HasFactory para criar dados fake
+    // SoftDeletes para gerenciar 
+    // DynamicConnection para determinar qual banco de dados gerenciar
+    use HasFactory, SoftDeletes, DynamicConnection;
 
     protected $fillable = [
         "num_imovel", "cidades_brasileira_id", 'cidade', "estados_brasileiro_id",
