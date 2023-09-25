@@ -78,6 +78,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
             $csvRow->update([
                 'scrapped_at' => now(),
             ]);
+            UpdateImoveisFromCaixaJobs::dispatchSync($csvRow);
         } catch (\Throwable $th) {
             Log::critical("Scrape Error update:{$csvRow->id};{$th->getMessage()};" . json_encode($data));
             Log::critical(json_encode($th->getTrace()));

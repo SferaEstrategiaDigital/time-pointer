@@ -27,7 +27,7 @@ class FilesCaixaEconomica extends Model
 
     public function estado()
     {
-        return $this->belongsTo(EstadosBrasileiro::class);
+        return $this->belongsTo(EstadosBrasileiro::class, 'estados_brasileiro_id');
     }
 
     public function imoveis()

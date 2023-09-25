@@ -17,4 +17,10 @@ class CaixaImovelsItem extends Model
     protected $casts = [
         'validated_at' => 'datetime'
     ];
+    public function caixaImovels()
+    {
+        return $this->belongsToMany(CaixaImovel::class, 'caixa_imovels_caixa_imovels_items', 'caixa_imovels_item_id', 'caixa_imovel_id')
+            ->withPivot('value')
+            ->withTimestamps();
+    }
 }

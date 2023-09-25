@@ -54,7 +54,7 @@ class DownloadCSVCaixaJobs implements ShouldQueue
         $md5_check = $estado->filesCaixaEconomica()->where('md5', $md5_file)->count();
 
         if ($md5_check) {
-            Log::critical("Já existe arquivo com o mesmo MD5");
+            Log::critical("Já existe arquivo com o mesmo MD5 ({$md5_file})");
             unlink($fullPath);
             return false;
         }
