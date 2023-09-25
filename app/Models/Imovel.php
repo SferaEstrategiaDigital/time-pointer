@@ -12,7 +12,7 @@ class Imovel extends Model
     // HasFactory para criar dados fake
     // SoftDeletes para gerenciar 
     // DynamicConnection para determinar qual banco de dados gerenciar
-    use HasFactory, SoftDeletes, DynamicConnection;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         "num_imovel", "cidades_brasileira_id", 'cidade', "estados_brasileiro_id",

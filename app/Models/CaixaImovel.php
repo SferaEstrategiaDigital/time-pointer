@@ -10,7 +10,7 @@ class CaixaImovel extends Model
 {
     // HasFactory para criar dados fake
     // DynamicConnection para determinar qual banco de dados gerenciar
-    use HasFactory, DynamicConnection;
+    use HasFactory;
 
     protected $fillable = [
         'insc_imobiliaria', 'scrapped_at', 'detalhes',

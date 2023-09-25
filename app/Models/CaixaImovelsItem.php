@@ -10,7 +10,7 @@ class CaixaImovelsItem extends Model
 {
     // HasFactory para criar dados fake
     // DynamicConnection para determinar qual banco de dados gerenciar
-    use HasFactory, DynamicConnection;
+    use HasFactory;
 
     protected $fillable = ['item', 'validated_at'];
 
