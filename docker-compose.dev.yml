@@ -18,8 +18,6 @@ services:
             - ${DOCKER_NETWORK_NAME}
         depends_on:
             - dbPrincipal
-            - dbA
-            - dbB
 
 
     dbPrincipal:
@@ -37,39 +35,6 @@ services:
             # - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataPrincipal"
             - "pg_data:/var/lib/postgresql/data"
             - "./storage/database_backups:/backups"
-
-    dbA:
-        image: postgres:14.5
-        restart: unless-stopped
-        environment:
-            POSTGRES_PASSWORD: root
-            POSTGRES_USER: root
-            POSTGRES_DB: investcubo-modernMonolith_app
-        networks:
-            - ${DOCKER_NETWORK_NAME}
-        ports:
-            - "5433:5432"
-        volumes:
-            # - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataA"
-            - "pg_dataA:/var/lib/postgresql/data"
-            - "./storage/database_backups:/backups"
-
-    dbB:
-        image: postgres:14.5
-        restart: unless-stopped
-        environment:
-            POSTGRES_PASSWORD: root
-            POSTGRES_USER: root
-            POSTGRES_DB: investcubo-modernMonolith_app
-        networks:
-            - ${DOCKER_NETWORK_NAME}
-        ports:
-            - "5434:5432"
-        volumes:
-            # - "./.docker/pgsql/pg_data:/var/lib/postgresql/dataB"
-            - "pg_dataB:/var/lib/postgresql/data"
-            - "./storage/database_backups:/backups"
-
 
     nginx:
         image: nginx:alpine
