@@ -10,7 +10,7 @@ class CaixaImovel extends Model
 {
     // HasFactory para criar dados fake
     // DynamicConnection para determinar qual banco de dados gerenciar
-    use HasFactory, DynamicConnection;
+    use HasFactory;
 
     protected $fillable = [
         'insc_imobiliaria', 'scrapped_at', 'detalhes',
@@ -32,13 +32,32 @@ class CaixaImovel extends Model
         return $this->morphMany(Log::class, 'loggable');
     }
 
-    public function items()
-    {
-        return $this->belongsToMany(CaixaImovelsItem::class, 'caixa_imovels_caixa_imovels_items');
-    }
-
     public function imovel()
     {
         return $this->morphMany(Imovel::class, 'imovel');
+    }
+
+    function cidade()
+    {
+        return $this->belongsTo(CidadesBrasileira::class, 'cidades_brasileira_id');
+    }
+
+    public function estado()
+    {
+        return $this->hasOneThrough(
+            EstadosBrasileiro::class,
+            CidadesBrasileira::class,
+            'id',                    // Chave estrangeira em Cidade
+            'id',                    // Chave estrangeira em Estado
+            'cidades_brasileira_id', // Chave local em Imovel
+            'estados_brasileiro_id'  // Chave local em Cidade
+        );
+    }
+
+    public function items()
+    {
+        return $this->belongsToMany(CaixaImovelsItem::class, 'caixa_imovels_caixa_imovels_items', 'caixa_imovel_id', 'caixa_imovels_item_id')
+            ->withPivot('value')
+            ->withTimestamps();
     }
 }

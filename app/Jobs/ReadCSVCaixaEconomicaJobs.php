@@ -8,6 +8,7 @@ use App\Models\CaixaEconimicaCSV;
 use App\Models\EstadosBrasileiro;
 use Illuminate\Support\Facades\DB;
 use App\Models\FilesCaixaEconomica;
+use App\Models\Imovel;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
@@ -43,18 +44,22 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
             return false;
         }
 
-        $file->update([
-            'failed' => 1
-        ]);
+        $file->update(['failed' => 1]);
+
+        $estado = $file->estado;
+
+        // Apaga todos os Imovel onde o estado brasileiro seja o do arquivo
+        Imovel::where('estados_brasileiro_id', $estado->id)->delete();
+
         $data = Storage::get("./Caixa/CSVs/{$file->filename}");
         if (!$data) {
             Log::critical("Arquivo não encontrado {$file->uuid}");
             return false;
         }
 
-        // $newProperties = collect();
-
         $data = explode(PHP_EOL, $data);
+        $total = 0;
+
         foreach ($data as $index => $row) {
             // index deve comecar no 4 por causa do cabeçalho do arquivo, ou se a linha for vazia
             if ($index < 4 || !trim($row)) {
@@ -124,6 +129,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
 
             // $newProperties->push($newReg);
 
+            Imovel::where('num_imovel', $num_imovel)->withTrashed()->restore();
             ScrapeCaixaEconomicaUrlJobs::dispatch($newReg);
 
             // $url = $columns[10]; // TODO: analisar no futuro a URL

@@ -22,6 +22,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
     protected $url = "https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnOrigem=index&hdnimovel=%s";
     protected $crawlerInstance;
     protected $delString = "O imóvel que você procura não está mais disponível para venda";
+    protected $response = null;
 
     public function __construct(protected CaixaImovel $csvRow)
     {
@@ -40,17 +41,17 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         $client = new Client();
 
         try {
-            $response = $client->request('GET', $this->url);
+            $this->response = $client->request('GET', $this->url);
         } catch (\Throwable $th) {
             Log::critical("Scrape Error connection: {$csvRow->id}");
             return false;
         }
 
         /* VERIFICA SE O STATUS DA RESPOSTA É 200 OU 301 */
-        if (!in_array($response->getStatusCode(), ['200', '301'])) {
+        if (!in_array($this->response->getStatusCode(), ['200', '301'])) {
             return false;
         }
-        $this->crawlerInstance = new Crawler((string)$response->getBody());
+        $this->crawlerInstance = new Crawler((string)$this->response->getBody());
 
         $deleted = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div/div');
 
@@ -78,6 +79,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
             $csvRow->update([
                 'scrapped_at' => now(),
             ]);
+            UpdateImoveisFromCaixaJobs::dispatchSync($csvRow);
         } catch (\Throwable $th) {
             Log::critical("Scrape Error update:{$csvRow->id};{$th->getMessage()};" . json_encode($data));
             Log::critical(json_encode($th->getTrace()));
@@ -94,8 +96,14 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         // $valorAvaliacao = $crawler->filterXpath('//html/body/div[1]/form/div[1]/div/div[2]/h4[1]');
         // $num_imovel = $crawler->filterXPath('//html/body/div[1]/form/div[1]/div/div[2]/div[1]/p/span[3]/strong');
 
-        $endereco = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[1]')
-            ->html();
+        try {
+            $endereco = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[1]')
+                ->html();
+        } catch (\Throwable $th) {
+            Log::critical("Falha ao raspar o endereço");
+            Log::critical((string)$this->response->getBody());
+            return false;
+        }
         // Add "Endereço:" no início pra seguir o padrão
         $data[] = "Endereço:" . explode('<br>', $endereco)[1];
 

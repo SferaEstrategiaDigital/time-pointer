@@ -14,4 +14,8 @@ class CidadesBrasileira extends Model
     {
         return $this->hasMany(CaixaImovel::class);
     }
+    public function imoveis()
+    {
+        return $this->hasMany(Imovel::class);
+    }
 }
