@@ -8,6 +8,7 @@
                         type="search"
                         placeholder="Buscar por imóvel, cidade, tipo de imóvel e estado"
                         v-model="searchInput"
+                        @keydown.enter="search"
                     />
                     <div class="absolute left-0 top-0 mt-2 ml-3">
                         <i
@@ -39,12 +40,25 @@
 
 <script setup>
 import { ref } from "vue";
+import axios from "axios";
 import ResultList from "./ResultList.vue";
 
 let searchInput = ref("");
 
 const search = () => {
     console.log(`Pesquisando: ${searchInput.value}`);
+    axios
+        .post(route("search"), {
+            query: searchInput.value,
+        })
+        .then((r) => {
+            r.data.imoveis.map((imovel) => {
+                console.log(imovel);
+            });
+        })
+        .finally(() => {
+            console.log("FIM");
+        });
 };
 
 let searchResults = ref([
