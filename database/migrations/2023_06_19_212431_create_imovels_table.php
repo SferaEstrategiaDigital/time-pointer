@@ -17,15 +17,15 @@ return new class extends Migration
         Schema::create('imovels', function (Blueprint $table) {
             $table->id();
             $table->uuid();
-            $table->text("num_imovel");
+            $table->text("num_imovel")->fulltext('num_imovel');
             $table->foreignIdFor(CidadesBrasileira::class);
-            $table->text('cidade');
+            $table->text('cidade')->fulltext('cidade');
             $table->foreignIdFor(EstadosBrasileiro::class);
-            $table->text('estado');
-            $table->string('cep');
-            $table->string('bairro');
+            $table->text('estado')->fulltext('estado');
+            $table->string('cep')->fulltext('cep');
+            $table->string('bairro')->fulltext('bairro');
             $table->foreignIdFor(PropertyType::class);
-            $table->string('tipo_imovel');
+            $table->string('tipo_imovel')->fulltext('tipo_imovel');
             $table->boolean('situacao')->nullable();
             $table->double('valor_venda', 15, 2, true)->nullable();
             $table->double('valor_avaliacao', 15, 2, true)->nullable();
