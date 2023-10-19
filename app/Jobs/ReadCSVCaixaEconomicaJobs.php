@@ -127,8 +127,6 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                 'md5_row' => $md5Row,
             ]);
 
-            // $newProperties->push($newReg);
-
             Imovel::where('num_imovel', $num_imovel)->withTrashed()->restore();
             ScrapeCaixaEconomicaUrlJobs::dispatch($newReg);
 

@@ -34,23 +34,31 @@ class UpdateImoveisFromCaixaJobs implements ShouldQueue
         $cidade = $imovel->cidade;
         $estado = $imovel->estado;
 
-        $cepId = CaixaImovelsItem::where('slug', 'endereco')->value('id');
-        $endereco = $imovel->items()->where('caixa_imovels_item_id', $cepId)->first();
+        $items = $imovel->items()->get();
 
-        if (!$endereco) {
+        $endereco = $items->filter(fn ($item) => $item->slug == 'endereco')->toArray();
+        $endereco = end($endereco);
+
+
+        if (!isset($endereco['pivot']['value']) || !$endereco['pivot']['value']) {
             return;
         }
 
-        preg_match("/CEP:\s*(\d{5}-?\d{3})/", $endereco, $matches);
+        preg_match("/CEP:\s*(\d{5}-?\d{3})/", $endereco['pivot']['value'], $matches);
         $cep = str_replace("-", "", $matches[1]);
 
-        $situacaoId = CaixaImovelsItem::where('slug', 'situacao')->value('id');
-        $situacao = $imovel->items()->where('caixa_imovels_item_id', $situacaoId)
-            ->first()->toArray();
+        $situacao = $items->filter(fn ($item) => $item->slug == 'situacao')->toArray();
+        $situacao = end($situacao)['pivot']['value'];
 
-        // $imovel->items()->where('caixa_imovels_item_id', 18)->get()->map(function ($item) {
-        // dd($item->toArray());
-        // });
+        $tipo_de_imovel = $items->filter(fn ($item) => $item->slug == 'tipo_de_imovel')->toArray();
+        $tipo_de_imovel = end($tipo_de_imovel)['pivot']['value'];
+
+        $forma_de_pagamento = $items->filter(fn ($item) => $item->slug == 'forma_de_pagamento');
+
+        $subitems = $forma_de_pagamento->map(function ($subitem) {
+            $subitem = $subitem->toArray();
+            return $subitem['pivot']['value'];
+        });
 
         $imovel = $imovel->imovel()
             ->withTrashed()->UpdateOrCreate([
@@ -63,19 +71,17 @@ class UpdateImoveisFromCaixaJobs implements ShouldQueue
                 'cep' => $cep,
                 'bairro' => $imovel->bairro,
                 'property_type_id' => 4,
-                'tipo_imovel' => "CASA",
-                'situacao' => $situacao['pivot']['value'] === "Ocupado" ? false : true,
+                'tipo_imovel' => $tipo_de_imovel,
+                'situacao' => $situacao === "Ocupado" ? false : true,
                 'valor_venda' =>  $imovel->valor_venda,
                 'valor_avaliacao' =>  $imovel->valor_avaliacao,
                 'desconto' =>  $imovel->desconto,
-                // 'financimento' =>  '$imovel->financimento',
+                'financimento' =>  true,
                 // 'consorcio' =>  '$imovel->consorcio',
                 // 'parcelamento' =>  '$imovel->parcelamento',
                 // 'fgts' =>  '$imovel->fgts',
             ]);
 
         $imovel->restore();
-
-        // dd($imovel->toArray());
     }
 }
