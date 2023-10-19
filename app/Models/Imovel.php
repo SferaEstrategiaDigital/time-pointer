@@ -6,13 +6,14 @@ use App\Traits\DynamicConnection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 
 class Imovel extends Model
 {
     // HasFactory para criar dados fake
     // SoftDeletes para gerenciar 
     // DynamicConnection para determinar qual banco de dados gerenciar
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Searchable;
 
     protected $fillable = [
         "num_imovel", "cidades_brasileira_id", 'cidade', "estados_brasileiro_id",
