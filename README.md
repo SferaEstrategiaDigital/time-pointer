@@ -1,17 +1,29 @@
 # Invest Cubo
 
-### Comando para rodar os jobs
+## Comando para rodar os jobs
+
+$ Rodar\ todos\ os\ estados $
 
 ```php
 App\Jobs\ManageCaixaImovelFilesJob::dispatchSync();
 ```
 
+$ Rodar\ do\ estado\ do\ Amazonas $
+
 ```php
 \App\Jobs\DownloadCSVCaixaJobs::dispatchSync(\App\Models\EstadosBrasileiro::find(4));
 ```
 
+$ Rodar\ raspagem\ de\ um\ registro $
+
 ```php
 \App\Jobs\ScrapeCaixaEconomicaUrlJobs::dispatchSync(\App\Models\CaixaImovel::find(4));
+```
+
+$ Rodar\ atualização\ de\ um\ registro $
+
+```php
+\App\Jobs\UpdateImoveisFromCaixaJobs::dispatchSync(\App\Models\CaixaImovel::find(4));
 ```
 
 ### SQL para testar se tem duplicados em IMOVELS
