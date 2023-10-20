@@ -19,7 +19,7 @@ class UpdateImoveisFromCaixaJobs implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected CaixaImovel $imovel)
+    public function __construct(protected CaixaImovel $caixImovel)
     {
         //
     }
@@ -29,12 +29,12 @@ class UpdateImoveisFromCaixaJobs implements ShouldQueue
      */
     public function handle()
     {
-        $imovel = $this->imovel;
+        $caixImovel = $this->caixImovel;
 
-        $cidade = $imovel->cidade;
-        $estado = $imovel->estado;
+        $cidade = $caixImovel->cidade;
+        $estado = $caixImovel->estado;
 
-        $items = $imovel->items()->get();
+        $items = $caixImovel->items()->get();
 
         $endereco = $items->filter(fn ($item) => $item->slug == 'endereco')->toArray();
         $endereco = end($endereco);
@@ -60,27 +60,26 @@ class UpdateImoveisFromCaixaJobs implements ShouldQueue
             return $subitem['pivot']['value'];
         });
 
-        $imovel = $imovel->imovel()
-            ->withTrashed()->UpdateOrCreate([
-                'num_imovel' => $imovel->num_imovel
-            ], [
-                'cidades_brasileira_id' => $cidade->id,
-                'cidade' => $cidade->nome,
-                'estados_brasileiro_id' => $estado->id,
-                'estado' => $estado->name,
-                'cep' => $cep,
-                'bairro' => $imovel->bairro,
-                'property_type_id' => 4,
-                'tipo_imovel' => $tipo_de_imovel,
-                'situacao' => $situacao === "Ocupado" ? false : true,
-                'valor_venda' =>  $imovel->valor_venda,
-                'valor_avaliacao' =>  $imovel->valor_avaliacao,
-                'desconto' =>  $imovel->desconto,
-                'financimento' =>  true,
-                // 'consorcio' =>  '$imovel->consorcio',
-                // 'parcelamento' =>  '$imovel->parcelamento',
-                // 'fgts' =>  '$imovel->fgts',
-            ]);
+        $imovel = Imovel::withTrashed()->UpdateOrCreate([
+            'num_imovel' => $caixImovel->num_imovel
+        ], [
+            'cidades_brasileira_id' => $cidade->id,
+            'cidade' => $cidade->nome,
+            'estados_brasileiro_id' => $estado->id,
+            'estado' => $estado->name,
+            'cep' => $cep,
+            'bairro' => $caixImovel->bairro,
+            'property_type_id' => 4,
+            'tipo_imovel' => $tipo_de_imovel,
+            'situacao' => $situacao === "Ocupado" ? false : true,
+            'valor_venda' =>  $caixImovel->valor_venda,
+            'valor_avaliacao' =>  $caixImovel->valor_avaliacao,
+            'desconto' =>  $caixImovel->desconto,
+            'financimento' =>  true,
+            // 'consorcio' =>  '$imovel->consorcio',
+            // 'parcelamento' =>  '$imovel->parcelamento',
+            // 'fgts' =>  '$imovel->fgts',
+        ]);
 
         $imovel->restore();
     }

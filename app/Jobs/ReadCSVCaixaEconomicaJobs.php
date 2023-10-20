@@ -115,7 +115,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
                 $valor_venda = trim(str_replace(',', '.', str_replace('.', '', $columns[5])));
             }
 
-            $newReg = $file->imoveis()->create([
+            $newReg = $file->imoveisCaixa()->create([
                 'num_imovel' => $num_imovel,
                 'bairro' => iconv("ISO-8859-1", "UTF-8", $columns[3]),
                 'endereco' => iconv("ISO-8859-1", "UTF-8", $columns[4]),
