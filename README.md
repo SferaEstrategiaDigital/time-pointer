@@ -11,7 +11,7 @@ App\Jobs\ManageCaixaImovelFilesJob::dispatchSync();
 $ Rodar\ do\ estado\ do\ Amazonas $
 
 ```php
-\App\Jobs\DownloadCSVCaixaJobs::dispatchSync(\App\Models\EstadosBrasileiro::find(4));
+\App\Jobs\DownloadCSVCaixaJobs::dispatchSync(\App\Models\EstadosBrasileiro::where('uf', 'rs')->first());
 ```
 
 $ Rodar\ raspagem\ de\ um\ registro $
