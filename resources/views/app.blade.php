@@ -5,6 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <meta name="description" content="Invest Cubo é a sua plataforma de pesquisa de imóveis de leilão da Caixa Econômica Federal. Descubra oportunidades únicas e invista de forma inteligente.">
+
+    <meta name="keywords" content="imóveis, leilão, Caixa Econômica Federal, investimento, Invest Cubo, pesquisa de imóveis, oportunidades, leilões da Caixa">
+
+    <meta name="author" content="Invest Cubo">
+
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
