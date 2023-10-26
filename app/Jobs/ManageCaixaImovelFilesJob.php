@@ -31,7 +31,7 @@ class ManageCaixaImovelFilesJob implements ShouldQueue
 
         foreach ($estados as $estado) {
             DownloadCSVCaixaJobs::dispatchSync($estado);
-            sleep(rand(3, 8));
+            sleep(rand(1, 2));
         }
     }
 }
