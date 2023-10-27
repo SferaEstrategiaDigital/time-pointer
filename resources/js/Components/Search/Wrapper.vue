@@ -33,7 +33,7 @@
                     Pesquisar
                 </button>
             </div>
-            <ResultList />
+            <ResultList :items="searchResults" />
         </div>
     </div>
 </template>
@@ -44,22 +44,6 @@ import axios from "axios";
 import ResultList from "./ResultList.vue";
 
 let searchInput = ref("");
-
-const search = () => {
-    console.log(`Pesquisando: ${searchInput.value}`);
-    axios
-        .post(route("search"), {
-            query: searchInput.value,
-        })
-        .then((r) => {
-            r.data.imoveis.map((imovel) => {
-                console.log(imovel);
-            });
-        })
-        .finally(() => {
-            console.log("FIM");
-        });
-};
 
 let searchResults = ref([
     {
@@ -75,43 +59,38 @@ let searchResults = ref([
         areaUtil: "401",
         areaTotal: "300",
     },
-    {
-        link: "/link-do-imovel",
-        title: "Montalvânia / MG",
-        property_type: "Apartamento",
-        price: "R$ 312.750",
-        discount: "55%",
-        address: "RUA AGASSIS,N. 545  QD 04 LR 31, CENTRO",
-        cep: "39495-000",
-        city: "MONTALVANIA",
-        state: "MG",
-        areaUtil: "401",
-        areaTotal: "300",
-    },
-    {
-        link: "/link-do-imovel",
-        title: "Montalvânia / MG",
-        property_type: "Terreno",
-        price: "R$ 312.750",
-        discount: "55%",
-        address: "RUA AGASSIS,N. 545  QD 04 LR 31, CENTRO",
-        cep: "39495-000",
-        city: "MONTALVANIA",
-        state: "MG",
-        areaUtil: "401",
-        areaTotal: "300",
-    },
-    {
-        link: "/link-do-imovel",
-        property_type: "Casa",
-        price: "R$ 312.750",
-        discount: "55%",
-        address: "RUA AGASSIS,N. 545  QD 04 LR 31, CENTRO",
-        cep: "39495-000",
-        city: "MONTALVANIA",
-        state: "MG",
-        areaUtil: "401",
-        areaTotal: "300",
-    },
 ]);
+
+const search = () => {
+    console.log(`Pesquisando: ${searchInput.value}`);
+    axios
+        .post(route("search"), {
+            query: searchInput.value,
+        })
+        .then((r) => {
+            console.log(searchResults.value);
+            searchResults.value = [];
+            console.log(r.data.data.imoveis);
+            r.data.data.imoveis.map((imovel) => {
+                console.log(imovel);
+                searchResults.value.push({
+                    link: "/link-do-imovel",
+                    situacao: imovel.situacao,
+                    title: imovel.cidade,
+                    property_type: imovel.property_type,
+                    price: imovel.price,
+                    discount: imovel.desconto.toString().replace(".", ","),
+                    address: imovel.endereco,
+                    cep: imovel.cep,
+                    city: imovel.cidade,
+                    state: imovel.estado,
+                    areaUtil: "401",
+                    areaTotal: "300",
+                });
+            });
+        })
+        .finally(() => {
+            console.log("FIM");
+        });
+};
 </script>

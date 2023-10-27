@@ -21,9 +21,10 @@
             ></span>
         </div>
         <h2 class="mt-2 font-semibold text-lg">
-            <a :href="result.link" class="text-gray-900 hover:text-gray-600"
-                >{{ result.city }} / {{ result.state }}</a
-            >
+            <a :href="result.link" class="text-gray-900 hover:text-gray-600">
+                <span class="capitalize">{{ result.city }}</span> /
+                <span class="uppercase">{{ result.state }}</span>
+            </a>
         </h2>
         <div class="infos">
             <a

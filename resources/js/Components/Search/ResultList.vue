@@ -76,7 +76,7 @@
     >
         <ResultItem
             class="mt-4"
-            v-for="(result, index) in searchResults"
+            v-for="(result, index) in items"
             :key="index"
             :result="result"
         />
@@ -88,6 +88,10 @@ import ResultItem from "./ResultItem.vue";
 import Tooltip from "../Tooltip.vue";
 
 import InputMaskMoney from "../InputMaskMoney.vue";
+
+const props = defineProps({
+    items: Object,
+});
 
 let searchInput = ref("");
 
@@ -116,74 +120,14 @@ const filters = ref({
     ],
 });
 
-const priceVisibility = false;
-
 const filterItems = ref({
     order: filters.value.order[0],
     priceBetween: [0, 0],
 });
 
-const search = () => {
-    console.log(`Pesquisando: ${searchInput.value}`);
-};
-
 const filter = (id, option) => {
     filterItems.value[id] = filters.value[id].filter((v) => v.id === option)[0];
 };
-
-let searchResults = ref([
-    {
-        link: "/link-do-imovel",
-        title: "Montalvânia / MG",
-        property_type: "Casa",
-        price: "R$ 312.750",
-        discount: "55%",
-        address: "RUA AGASSIS,N. 545  QD 04 LR 31, CENTRO",
-        cep: "39495-000",
-        city: "MONTALVANIA",
-        state: "MG",
-        areaUtil: "401",
-        areaTotal: "300",
-    },
-    {
-        link: "/link-do-imovel",
-        title: "Montalvânia / MG",
-        property_type: "Apartamento",
-        price: "R$ 312.750",
-        discount: "55%",
-        address: "RUA AGASSIS,N. 545  QD 04 LR 31, CENTRO",
-        cep: "39495-000",
-        city: "MONTALVANIA",
-        state: "MG",
-        areaUtil: "401",
-        areaTotal: "300",
-    },
-    {
-        link: "/link-do-imovel",
-        title: "Montalvânia / MG",
-        property_type: "Terreno",
-        price: "R$ 312.750",
-        discount: "55%",
-        address: "RUA AGASSIS,N. 545  QD 04 LR 31, CENTRO",
-        cep: "39495-000",
-        city: "MONTALVANIA",
-        state: "MG",
-        areaUtil: "401",
-        areaTotal: "300",
-    },
-    {
-        link: "/link-do-imovel",
-        property_type: "Casa",
-        price: "R$ 312.750",
-        discount: "55%",
-        address: "RUA AGASSIS,N. 545  QD 04 LR 31, CENTRO",
-        cep: "39495-000",
-        city: "MONTALVANIA",
-        state: "MG",
-        areaUtil: "401",
-        areaTotal: "300",
-    },
-]);
 </script>
 
 <style scoped>
