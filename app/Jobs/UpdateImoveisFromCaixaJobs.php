@@ -36,16 +36,9 @@ class UpdateImoveisFromCaixaJobs implements ShouldQueue
 
         $items = $caixImovel->items()->get();
 
-        $endereco = $items->filter(fn ($item) => $item->slug == 'endereco')->toArray();
-        $endereco = end($endereco);
+        $endereco = $items->filter(fn ($item) => $item->slug == 'endereco')->first()->pivot->value;
 
-
-        if (!isset($endereco['pivot']['value']) || !$endereco['pivot']['value']) {
-            return;
-        }
-
-        preg_match("/CEP:\s*(\d{5}-?\d{3})/", $endereco['pivot']['value'], $matches);
-        $cep = str_replace("-", "", $matches[1]);
+        $cep = $items->filter(fn ($item) => $item->slug == 'cep')->first()->pivot->value;
 
         $situacao = $items->filter(fn ($item) => $item->slug == 'situacao')->toArray();
         $situacao = end($situacao)['pivot']['value'];

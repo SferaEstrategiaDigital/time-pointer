@@ -88,7 +88,7 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
 
             $cidade = $estado
                 ->cidades()->firstOrCreate([
-                    'nome' => strtoupper($columns[2]),
+                    'nome' => capitalizer(trim($columns[2])),
                 ]);
 
             // LEMBRA DE REPARAR ABAIXO
@@ -117,13 +117,13 @@ class ReadCSVCaixaEconomicaJobs implements ShouldQueue
 
             $newReg = $file->imoveisCaixa()->create([
                 'num_imovel' => $num_imovel,
-                'bairro' => iconv("ISO-8859-1", "UTF-8", $columns[3]),
-                'endereco' => iconv("ISO-8859-1", "UTF-8", $columns[4]),
+                'bairro' => capitalizer(trim(iconv("ISO-8859-1", "UTF-8", $columns[3]))),
+                'endereco' => capitalizer(trim(iconv("ISO-8859-1", "UTF-8", $columns[4]))),
                 'cidades_brasileira_id' => $cidade->id,
                 'valor_venda' => $valor_venda,
                 'valor_avaliacao' => str_replace(',', '.', str_replace('.', '', $columns[6])),
                 'desconto' => floatval($columns[7]),
-                'modalidade_venda' => iconv("ISO-8859-1", "UTF-8", $columns[9]),
+                'modalidade_venda' => trim(iconv("ISO-8859-1", "UTF-8", $columns[9])),
                 'md5_row' => $md5Row,
             ]);
 

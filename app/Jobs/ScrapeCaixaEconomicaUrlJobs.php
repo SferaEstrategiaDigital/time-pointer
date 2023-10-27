@@ -104,8 +104,20 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
             Log::critical((string)$this->response->getBody());
             return false;
         }
-        // Add "Endereço:" no início pra seguir o padrão
-        $data[] = "Endereço:" . explode('<br>', $endereco)[1];
+
+        $pattern = "/(.+?),\s[\w -]+\s-\sCEP:\s(.+?),\s[\w ]+\s-\s[\w ]+/iu";
+
+        // Usando preg_match para extrair as partes do endereço
+        if (preg_match($pattern, strtolower(explode('<br>', $endereco)[1]), $matches)) {
+            // Add "Endereço:" no início pra seguir o padrão que vêm do site da Caixa
+            $data[] = "Endereço:" . capitalizer(trim($matches[1]));
+            $data[] = "CEP: " . trim($matches[2]);
+        } else {
+            Log::debug(strtolower(explode('<br>', $endereco)[1]));
+            Log::debug($pattern);
+            Log::critical("Endereço fora do padrão");
+            return false;
+        }
 
         // BUSCA PELO COMENTÁRIO ONDE DEFINE SE O IMÓVEL É OU NÃO OCUPADO
         $ocupacao = $this->crawlerInstance->filterXPath('//comment()')->each(function (Crawler $node, $i) {
