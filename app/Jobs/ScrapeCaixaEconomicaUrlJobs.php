@@ -60,7 +60,21 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
             return false;
         }
 
+        $deleted = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div/div/div/h5');
+
+        $this->delString = "Ocorreu um erro durante o processamento de sua solicitação.";
+
+        if ($deleted->count() && strpos($deleted->text(), "$this->delString") > -1) {
+            Log::debug($deleted->text());
+            Log::critical("Scrape Error requestError: {$csvRow->id}");
+            return false;
+        }
+
         $data = $this->getData();
+
+        if (!$data) {
+            return false;
+        }
 
         foreach ($data as $item) {
             $split = explode(":", $item, 2);
@@ -101,11 +115,12 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
                 ->html();
         } catch (\Throwable $th) {
             Log::critical("Falha ao raspar o endereço");
-            Log::critical((string)$this->response->getBody());
+            Log::info((string)$this->response->getBody());
+            log::critical($endereco);
             return false;
         }
 
-        $pattern = "/(.+?),\s[\w -]+\s-\sCEP:\s(.+?),\s[\w ]+\s-\s[\w ]+/iu";
+        $pattern = "/(.+?),\s[\w -\(\)]+\s-\sCEP:\s(.+?),\s[\w ]+\s-\s[\w ]+/iu";
 
         // Usando preg_match para extrair as partes do endereço
         if (preg_match($pattern, strtolower(explode('<br>', $endereco)[1]), $matches)) {
@@ -152,6 +167,15 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         $destaque = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div[1]/div/div[3]/p[2]');
 
         $data[] = $destaque->count() ? $destaque->text() : "";
+
+        // $fotos = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div[2]/div[1]/img');
+
+        // $fotos = $fotos->each(fn ($foto) => replace('/.+?"(.+?)"/', fn ($m) => $m[1], $foto->attr('onclick')));
+
+        // if ($fotos->count() > 2) {
+        //     dd($fotos);
+        // }
+
 
         return array_merge($data, $spans, $infos);
     }

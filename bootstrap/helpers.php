@@ -1,5 +1,33 @@
 <?php
 
+if (!function_exists('replace')) {
+    /**
+     * Replace string or pattern in a string.
+     *
+     * @param  mixed  $search
+     * @param  mixed  $replace
+     * @param  string  $subject
+     * @return string
+     */
+    function replace($search, $replace, $subject)
+    {
+        // Se $search for uma expressão regular
+        if (is_string($search) && @preg_match($search, '') !== false) {
+            // Se $replace for uma função de callback
+            if (is_callable($replace)) {
+                return preg_replace_callback($search, $replace, $subject);
+            }
+
+            // Se $replace for uma string ou array
+            return preg_replace($search, $replace, $subject);
+        }
+
+        // Comportamento padrão de substituição de string
+        return str_replace($search, $replace, $subject);
+    }
+}
+
+
 if (!function_exists('capitalizer')) {
     /**
      * Formata o nome da cidade capitalizando a primeira letra de cada palavra, exceto preposições.
