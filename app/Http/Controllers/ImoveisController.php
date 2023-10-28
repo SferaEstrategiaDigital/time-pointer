@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SearchResultResource;
 use App\Models\Imovel;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,9 +28,12 @@ class ImoveisController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Imovel $imovel)
+    public function show(Imovel $imovei)
     {
-        return Inertia::render('Imoveis/Index');
+        // dd(new SearchResultResource($imovei));
+        return Inertia::render('Imoveis/Index', [
+            'imovel' => new SearchResultResource($imovei)
+        ]);
     }
 
     /**

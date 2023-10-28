@@ -49,8 +49,7 @@ const props = defineProps({
 });
 
 const ImovelDetalhe = (link) => {
-    console.log(route("imoveis.show", link));
-    // Inertia.visit(route("imoveis.show", link));
+    Inertia.visit(route("imoveis.show", link));
 };
 </script>
 
