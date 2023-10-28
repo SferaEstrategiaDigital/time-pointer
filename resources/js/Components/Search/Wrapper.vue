@@ -45,36 +45,20 @@ import ResultList from "./ResultList.vue";
 
 let searchInput = ref("");
 
-let searchResults = ref([
-    {
-        link: "/link-do-imovel",
-        title: "Montalvânia / MG",
-        property_type: "Casa",
-        price: "R$ 312.750",
-        discount: "55%",
-        address: "RUA AGASSIS,N. 545  QD 04 LR 31, CENTRO",
-        cep: "39495-000",
-        city: "MONTALVANIA",
-        state: "MG",
-        areaUtil: "401",
-        areaTotal: "300",
-    },
-]);
+let searchResults = ref([]);
 
 const search = () => {
     console.log(`Pesquisando: ${searchInput.value}`);
+    searchResults.value = [];
     axios
         .post(route("search"), {
             query: searchInput.value,
         })
         .then((r) => {
-            console.log(searchResults.value);
-            searchResults.value = [];
-            console.log(r.data.data.imoveis);
-            r.data.data.imoveis.map((imovel) => {
-                console.log(imovel);
+            // console.log(r.data.data.imoveis[0]);
+            r.data.data.imoveis.forEach((imovel) => {
                 searchResults.value.push({
-                    link: "/link-do-imovel",
+                    link: imovel.link,
                     situacao: imovel.situacao,
                     title: imovel.cidade,
                     property_type: imovel.property_type,

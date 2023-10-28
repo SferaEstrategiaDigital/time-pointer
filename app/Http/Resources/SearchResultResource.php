@@ -21,7 +21,7 @@ class SearchResultResource extends JsonResource
             ->whereNotNull('scrapped_at')
             ->latest()->first();
 
-        // $this->items = $caixaImovel->items()->get();
+        $this->items = $caixaImovel->items()->get();
 
         return [
             "link" => $this->uuid,
@@ -31,7 +31,7 @@ class SearchResultResource extends JsonResource
             "price" => "R$ " . number_format($this->valor_venda, 2, ',', '.'),
             "desconto" => $this->desconto,
             "endereco" => $caixaImovel->endereco,
-            "cep" => "00000-999",
+            "cep" => $this->getItem("cep"),
             "cidade" => $this->cidade,
             "estado" => $caixaImovel->estado->uf,
             "areaUtil" => "",
