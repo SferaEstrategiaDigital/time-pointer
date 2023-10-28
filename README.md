@@ -26,6 +26,13 @@ $ Rodar\ atualização\ de\ um\ registro $
 \App\Jobs\UpdateImoveisFromCaixaJobs::dispatchSync(\App\Models\CaixaImovel::find(4));
 ```
 
+$ uso\ de\ geocoder$
+
+```php
+$geocoder = app('geocoder');
+$coordinates = $geocoder->getCoordinates('Residencial Jardins da Cidade');
+```
+
 ### SQL para testar se tem duplicados em IMOVELS
 
 ```sql

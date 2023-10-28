@@ -176,6 +176,7 @@ return [
         App\Providers\AssinaturaServiceProvider::class,
         App\Providers\ImovelServiceProvider::class,
         App\Providers\FilesCaixaEconomicaServiceProvider::class,
+        App\Providers\GeocodingServiceProvider::class
     ])->toArray(),
 
     /*
