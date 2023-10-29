@@ -168,13 +168,13 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
 
         $data[] = $destaque->count() ? $destaque->text() : "";
 
-        // $fotos = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div[2]/div[1]/img');
+        $fotos = $this->crawlerInstance->filterXPath('//html/body/div[1]/form/div[2]/div[1]/img');
 
-        // $fotos = $fotos->each(fn ($foto) => replace('/.+?"(.+?)"/', fn ($m) => $m[1], $foto->attr('onclick')));
+        $fotos = $fotos->each(fn ($foto, $i) => "Foto" . $i + 1 . ":" . replace('/.+?"(.+?)"/', fn ($m) => $m[1], $foto->attr('onclick')));
 
-        // if ($fotos->count() > 2) {
-        //     dd($fotos);
-        // }
+        if (!empty($fotos)) {
+            $data = array_merge($data, $fotos);
+        }
 
 
         return array_merge($data, $spans, $infos);
