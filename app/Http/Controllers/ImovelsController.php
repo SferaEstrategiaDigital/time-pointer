@@ -24,7 +24,7 @@ class ImovelsController extends Controller
         // return response()->json(['imoveis' => $imoveis]);
         return response()->json([
             'data' => [
-                'imoveis' => SearchResultResource::collection($imoveis)
+                'imoveis' => SearchResultResource::collection($imoveis, true)
             ]
         ]);
     }

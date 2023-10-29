@@ -32,7 +32,7 @@ class ImoveisController extends Controller
     {
         // dd(new SearchResultResource($imovei));
         return Inertia::render('Imoveis/Index', [
-            'imovel' => new SearchResultResource($imovei)
+            'imovel' => new SearchResultResource($imovei, true)
         ]);
     }
 

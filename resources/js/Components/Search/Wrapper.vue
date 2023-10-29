@@ -33,19 +33,38 @@
                     Pesquisar
                 </button>
             </div>
-            <ResultList :items="searchResults" />
+            <ResultList @viewDetails="openModal" :items="searchResults" />
+
+            <SimpleModal :isOpen="showModal" @close="showModal = false">
+                <template #content>
+                    <Detalhes :imovel="modalImovel" />
+                </template>
+            </SimpleModal>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import SimpleModal from "@/Components/SimpleModal.vue";
 import axios from "axios";
 import ResultList from "./ResultList.vue";
+import Detalhes from "@/Components/Imoveis/Detalhes.vue";
 
 let searchInput = ref("");
 
 let searchResults = ref([]);
+
+const showModal = ref(false);
+
+const modalImovel = ref({});
+
+const openModal = (data) => {
+    // console.log(data);
+    modalImovel.value = data;
+    console.log(modalImovel.value);
+    showModal.value = true;
+};
 
 const search = () => {
     console.log(`Pesquisando: ${searchInput.value}`);
@@ -55,23 +74,7 @@ const search = () => {
             query: searchInput.value,
         })
         .then((r) => {
-            // console.log(r.data.data.imoveis[0]);
-            r.data.data.imoveis.forEach((imovel) => {
-                searchResults.value.push({
-                    link: imovel.link,
-                    situacao: imovel.situacao,
-                    title: imovel.cidade,
-                    property_type: imovel.property_type,
-                    price: imovel.price,
-                    discount: imovel.desconto.toString().replace(".", ","),
-                    address: imovel.endereco,
-                    cep: imovel.cep,
-                    city: imovel.cidade,
-                    state: imovel.estado,
-                    areaUtil: "401",
-                    areaTotal: "300",
-                });
-            });
+            searchResults.value = r.data.data.imoveis;
         })
         .finally(() => {
             console.log("FIM");

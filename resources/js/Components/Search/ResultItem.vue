@@ -1,5 +1,5 @@
 <template>
-    <div class="card" @click="ImovelDetalhe(result.link)">
+    <div class="card">
         <div class="header">
             <span
                 class="inline-block bg-blue-600 text-white text-xs px-2 rounded-full uppercase font-semibold tracking-wide"
@@ -16,22 +16,21 @@
                 >Valor: <br />{{ result.price }}</span
             >
             <span class="ml-2 text-right"
-                >Desconto<br />{{ result.discount }}
+                >Desconto<br />{{
+                    result.desconto.toString().replace(".", ",")
+                }}
                 <i class="fas fa-long-arrow-alt-down"></i
             ></span>
         </div>
         <h2 class="mt-2 font-semibold text-lg">
-            <span
-                :href="route('imoveis.show', result.link)"
-                class="text-gray-900 hover:text-gray-600"
-            >
-                <span class="capitalize">{{ result.city }}</span> /
-                <span class="uppercase">{{ result.state }}</span>
+            <span class="text-gray-900 hover:text-gray-600">
+                <span class="capitalize">{{ result.cidade }}</span> /
+                <span class="uppercase">{{ result.estado }}</span>
             </span>
         </h2>
         <div class="infos">
             <span class="text-gray-600 hover:text-gray-900 text-sm">
-                <div><i class="flaticon-pin"></i>{{ result.address }}</div>
+                <div><i class="flaticon-pin"></i>{{ result.endereco }}</div>
                 <div><span>CEP:</span> {{ result.cep }}</div>
             </span>
         </div>
@@ -47,10 +46,6 @@ const props = defineProps({
         required: true,
     },
 });
-
-const ImovelDetalhe = (link) => {
-    Inertia.visit(route("imoveis.show", link));
-};
 </script>
 
 <style scoped>

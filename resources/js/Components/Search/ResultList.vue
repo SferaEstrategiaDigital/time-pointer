@@ -75,6 +75,7 @@
         class="grid md:gap-8 gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
     >
         <ResultItem
+            @click="$emit('viewDetails', result)"
             class="mt-4"
             v-for="(result, index) in items"
             :key="index"
@@ -92,6 +93,8 @@ import InputMaskMoney from "../InputMaskMoney.vue";
 const props = defineProps({
     items: Object,
 });
+
+const emit = defineEmits(["viewDetails"]);
 
 let searchInput = ref("");
 

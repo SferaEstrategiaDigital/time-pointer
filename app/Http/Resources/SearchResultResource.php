@@ -11,6 +11,18 @@ class SearchResultResource extends JsonResource
 
     private $items = null;
     /**
+     * Create a new instance.
+     *
+     * @param  mixed  $resource  The resource to be transformed.
+     * @param  bool   $addPhotos Determines if photos should be added to the transformation.
+     * @return void
+     */
+
+    function __construct($resource, public $addPhotos = false)
+    {
+        parent::__construct($resource);
+    }
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
@@ -31,6 +43,7 @@ class SearchResultResource extends JsonResource
             "price" => "R$ " . number_format($this->valor_venda, 2, ',', '.'),
             "desconto" => $this->desconto,
             "endereco" => $caixaImovel->endereco,
+            "fotos" => $this->when(true, $this->getItems('/foto.+/i')),
             "cep" => $this->getItem("cep"),
             "cidade" => $this->cidade,
             "estado" => $caixaImovel->estado->uf,
@@ -46,5 +59,16 @@ class SearchResultResource extends JsonResource
             return $value->pivot->value;
         }
         return "";
+    }
+
+    private function getItems($pattern)
+    {
+        $values = $this->items->filter(function ($item) use ($pattern) {
+            return preg_match($pattern, $item->slug);
+        });
+
+        return $values->map(function ($item) {
+            return $item->pivot->value;
+        })->all();
     }
 }
