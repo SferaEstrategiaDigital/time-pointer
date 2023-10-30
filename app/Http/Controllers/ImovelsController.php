@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\SearchResultResource;
+use App\Http\Resources\SearchResultsResource;
 use App\Models\Imovel;
 use Illuminate\Http\Request;
 
@@ -19,14 +20,11 @@ class ImovelsController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $imoveis = Imovel::search($query)->get();
+        $imoveis = Imovel::search($query)->paginate(15);
         // return view('search-results', ['imoveis' => $imoveis]);
         // return response()->json(['imoveis' => $imoveis]);
-        return response()->json([
-            'data' => [
-                'imoveis' => SearchResultResource::collection($imoveis, true)
-            ]
-        ]);
+        return response()->json(new SearchResultsResource($imoveis));
+        // return response()->json($imoveis);
     }
 
     /**

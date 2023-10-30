@@ -60,7 +60,6 @@ const showModal = ref(false);
 const modalImovel = ref({});
 
 const openModal = (data) => {
-    // console.log(data);
     modalImovel.value = data;
     console.log(modalImovel.value);
     showModal.value = true;
@@ -74,10 +73,10 @@ const search = () => {
             query: searchInput.value,
         })
         .then((r) => {
-            searchResults.value = r.data.data.imoveis;
+            searchResults.value = r.data.data;
         })
         .finally(() => {
-            console.log("FIM");
+            //
         });
 };
 </script>
