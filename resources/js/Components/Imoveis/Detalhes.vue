@@ -1,6 +1,6 @@
 <template>
     <div class="py-2">
-        <div class="mx-auto sm:px-6 lg:px-8 flex flex-row">
+        <div class="mx-auto sm:px-6 lg:px-8 grid grid-cols-2">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <h1 class="p-6 text-gray-900 text-3xl">
                     {{ imovel.endereco }}
