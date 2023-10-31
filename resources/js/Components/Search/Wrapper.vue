@@ -8,7 +8,7 @@
                         type="search"
                         placeholder="Buscar por imóvel, cidade, tipo de imóvel e estado"
                         v-model="searchInput"
-                        @keydown.enter="search"
+                        @keydown.enter="btnSearch"
                     />
                     <div class="absolute left-0 top-0 mt-2 ml-3">
                         <i
@@ -22,21 +22,36 @@
             >
                 <button
                     class="bg-orange-500 text-white font-bold p-2 rounded hover:bg-orange-600"
-                    @click="search()"
+                    @click="btnSearch()"
                 >
                     Estou com sorte
                 </button>
                 <button
                     class="bg-orange-500 text-white font-bold p-2 rounded hover:bg-orange-600"
-                    @click="search()"
+                    @click="btnSearch()"
                 >
                     Pesquisar
                 </button>
             </div>
-            <ResultList @viewDetails="openModal" :items="searchResults" />
+            <ResultList
+                @viewDetails="openModal"
+                :meta="meta"
+                :term="searchInputText"
+                :loading="loading"
+                @change-page="loadPage"
+                :items="searchResults"
+            />
 
             <SimpleModal :isOpen="showModal" @close="showModal = false">
                 <template #content>
+                    <div class="flex">
+                        <button
+                            @click="showModal = false"
+                            class="text-3xl bg-red-300 px-2 py-1 rounded-lg"
+                        >
+                            Voltar
+                        </button>
+                    </div>
                     <Detalhes :imovel="modalImovel" />
                 </template>
             </SimpleModal>
@@ -51,11 +66,16 @@ import axios from "axios";
 import ResultList from "./ResultList.vue";
 import Detalhes from "@/Components/Imoveis/Detalhes.vue";
 
-let searchInput = ref("");
+const searchInput = ref("");
 
-let searchResults = ref([]);
+const searchInputText = ref("");
+const meta = ref({});
+
+const searchResults = ref([]);
 
 const showModal = ref(false);
+
+const loading = ref(false);
 
 const modalImovel = ref({});
 
@@ -65,18 +85,31 @@ const openModal = (data) => {
     showModal.value = true;
 };
 
-const search = () => {
-    console.log(`Pesquisando: ${searchInput.value}`);
-    searchResults.value = [];
-    axios
-        .post(route("search"), {
-            query: searchInput.value,
-        })
-        .then((r) => {
-            searchResults.value = r.data.data;
-        })
-        .finally(() => {
-            //
-        });
+const btnSearch = async () => {
+    loading.value = true;
+    meta.value = {};
+    searchResults.value = {};
+    searchInputText.value = searchInput.value;
+    const response = await search();
+    searchResults.value = response.data.data;
+    meta.value = response.data.meta;
+    loading.value = false;
+};
+
+const search = async (page) => {
+    const response = await axios.post(route("search"), {
+        query: searchInputText.value,
+        page: page ?? null,
+    });
+
+    return response;
+};
+
+const loadPage = async (page) => {
+    console.log(page);
+    loading.value = true;
+    const response = await search(page);
+    meta.value = response.data.meta;
+    loading.value = false;
 };
 </script>

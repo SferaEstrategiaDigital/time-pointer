@@ -1,0 +1,2 @@
+php artisan mig:ref --step --seed
+rm -rfv storage/app/Caixa/CSVs/*.csv

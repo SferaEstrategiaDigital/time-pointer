@@ -71,8 +71,20 @@
             </Tooltip>
         </div>
     </div>
+
+    <SearchStats
+        class="my-4"
+        v-if="items.length"
+        :from="meta.from"
+        :to="meta.to"
+        :total="meta.total"
+        :currentPage="meta.current_page"
+        :lastPage="meta.last_page"
+        :term="term"
+    />
     <div
         class="grid md:gap-8 gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        v-if="!loading"
     >
         <ResultItem
             @click="$emit('viewDetails', result)"
@@ -82,21 +94,40 @@
             :result="result"
         />
     </div>
+    <div class="flex justify-center my-16" v-else>
+        <div class="image-cnt flex relative">
+            <img class="h-40" src="file.png" />
+        </div>
+    </div>
+
+    <Pagination
+        class="mt-4"
+        v-if="items.length"
+        :currentPage="meta.current_page"
+        :lastPage="meta.last_page"
+        @change-page="$emit('changePage', $event)"
+    />
 </template>
 <script setup>
 import { ref } from "vue";
 import ResultItem from "./ResultItem.vue";
 import Tooltip from "../Tooltip.vue";
+import Pagination from "@/Components/Search/Pagination.vue";
+import SearchStats from "@/Components/Search/SearchStats.vue";
 
 import InputMaskMoney from "../InputMaskMoney.vue";
 
 const props = defineProps({
     items: Object,
+    meta: Object,
+    term: String,
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 });
 
-const emit = defineEmits(["viewDetails"]);
-
-let searchInput = ref("");
+const emit = defineEmits(["viewDetails", "changePage"]);
 
 const filters = ref({
     order: [
@@ -134,6 +165,30 @@ const filter = (id, option) => {
 </script>
 
 <style scoped>
+@keyframes slideEffect {
+    0% {
+        left: -101%;
+    }
+    30% {
+        left: 150%;
+    }
+    100% {
+        left: 150%;
+    }
+}
+
+.image-cnt::before {
+    content: "";
+    background: rgba(255, 255, 255, 0.4);
+    width: 60%;
+    height: 100%;
+    top: 0%;
+    left: -101%;
+    transform: skew(45deg);
+    position: absolute;
+    animation: slideEffect 2.5s ease-in-out infinite;
+}
+
 .list-item {
     @apply p-1 box-border border bg-green-600 cursor-pointer;
 }
