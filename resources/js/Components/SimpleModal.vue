@@ -10,7 +10,7 @@
             @click="close"
         ></div>
         <div
-            class="relative bg-white p-4 w-full h-screen place-items-center shadow-lg rounded-xl overflow-auto"
+            class="relative bg-white p-4 place-items-center shadow-lg rounded-xl overflow-auto w-3/4 h-3/4"
         >
             <slot name="content"></slot>
         </div>
