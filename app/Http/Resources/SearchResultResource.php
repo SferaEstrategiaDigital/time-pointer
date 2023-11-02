@@ -37,6 +37,7 @@ class SearchResultResource extends JsonResource
 
         return [
             "link" => $this->uuid,
+            "num_imovel" => $this->num_imovel,
             "situacao" => $this->situacao,
             "title" => $this->cidade,
             "property_type" => $this->tipo_imovel,
@@ -47,8 +48,10 @@ class SearchResultResource extends JsonResource
             "cep" => $this->getItem("cep"),
             "cidade" => $this->cidade,
             "estado" => $caixaImovel->estado->uf,
-            "areaUtil" => "",
-            "areaTotal" => "",
+            "financimento" => $this->financimento,
+            "consorcio" => $this->consorcio,
+            "parcelamento" => $this->parcelamento,
+            "fgts" => $this->fgts,
         ];
     }
 
