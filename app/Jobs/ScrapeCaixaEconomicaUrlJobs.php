@@ -157,7 +157,7 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         $infos = $this->crawlerInstance->filterXpath('//html/body/div[1]/form/div[1]/div/div[3]/p[3]');
         $infos = explode('<br>', $infos->html());
         $infos = array_filter($infos);
-        $infos = array_map(fn ($info) => "Forma de pagamento:" . trim(strip_tags($info), " \t\n\r\0\x0B&nbsp;"), $infos);
+        $infos = array_map(fn ($info) => "infos:" . trim(strip_tags($info), " \t\n\r\0\x0B&nbsp;"), $infos);
 
         // $data['num_quartos'] = $this->extractInfo($spans,"Quartos: ", 0);
         // $data['insc_imobiliaria'] = $this->extractInfo($spans, "Inscrição imobiliária: ", 0);
@@ -175,7 +175,6 @@ class ScrapeCaixaEconomicaUrlJobs implements ShouldQueue
         if (!empty($fotos)) {
             $data = array_merge($data, $fotos);
         }
-
 
         return array_merge($data, $spans, $infos);
     }
