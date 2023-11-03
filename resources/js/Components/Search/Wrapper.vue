@@ -44,11 +44,15 @@
 
             <SimpleModal :isOpen="showModal" @close="showModal = false">
                 <template #content>
-                    <div class="flex">
+                    <div class="flex justify-end">
                         <button
                             @click="showModal = false"
-                            class="text-3xl bg-red-300 px-2 py-1 rounded-lg"
+                            class="bg-red-300 px-2 py-1 rounded-lg"
                         >
+                            <i
+                                class="fa fa-chevron-circle-left"
+                                aria-hidden="true"
+                            ></i>
                             Voltar
                         </button>
                     </div>
