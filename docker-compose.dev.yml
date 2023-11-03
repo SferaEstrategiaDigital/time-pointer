@@ -21,7 +21,11 @@ services:
 
 
     db:
-        image: postgres:14.5
+        build:
+            args:
+                user: omarceleza
+                uid: 1000
+            context: ./.docker/postgres
         restart: unless-stopped
         environment:
             POSTGRES_PASSWORD: root
